@@ -23,11 +23,32 @@ import "@xyflow/react/dist/style.css";
 const NetworkNode: React.FC<NodeProps> = ({ data }) => {
 	return (
 		<div className="relative">
+			{/* Multiple connection handles for mesh network */}
 			<Handle
 				type="target"
 				position={Position.Top}
 				style={{ background: "#555", border: "none" }}
+				id="top"
 			/>
+			<Handle
+				type="target"
+				position={Position.Left}
+				style={{ background: "#555", border: "none" }}
+				id="left"
+			/>
+			<Handle
+				type="target"
+				position={Position.Right}
+				style={{ background: "#555", border: "none" }}
+				id="right"
+			/>
+			<Handle
+				type="target"
+				position={Position.Bottom}
+				style={{ background: "#555", border: "none" }}
+				id="bottom"
+			/>
+
 			<motion.div
 				initial={{ scale: 0 }}
 				animate={{ scale: 1 }}
@@ -35,7 +56,7 @@ const NetworkNode: React.FC<NodeProps> = ({ data }) => {
 				className={`
 					px-4 py-3 rounded-xl shadow-lg border-2 cursor-pointer
 					transition-all duration-300 hover:shadow-xl hover:scale-105
-					${data.isHub ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300 bg-white'}
+					${data.isHub ? 'border-yellow-400 bg-card' : 'border-border bg-card'}
 				`}
 				style={{ minWidth: '120px' }}
 			>
@@ -49,10 +70,10 @@ const NetworkNode: React.FC<NodeProps> = ({ data }) => {
 						</span>
 					</div>
 					<div className="text-center">
-						<div className="font-semibold text-sm text-gray-800">
+						<div className="font-semibold text-sm text-foreground">
 							{data.label}
 						</div>
-						<div className="text-xs text-gray-500">
+						<div className="text-xs text-muted-foreground">
 							{data.symbol}
 						</div>
 					</div>
@@ -74,10 +95,31 @@ const NetworkNode: React.FC<NodeProps> = ({ data }) => {
 					)}
 				</div>
 			</motion.div>
+
+			{/* Source handles */}
+			<Handle
+				type="source"
+				position={Position.Top}
+				style={{ background: "#555", border: "none" }}
+				id="top-out"
+			/>
+			<Handle
+				type="source"
+				position={Position.Left}
+				style={{ background: "#555", border: "none" }}
+				id="left-out"
+			/>
+			<Handle
+				type="source"
+				position={Position.Right}
+				style={{ background: "#555", border: "none" }}
+				id="right-out"
+			/>
 			<Handle
 				type="source"
 				position={Position.Bottom}
 				style={{ background: "#555", border: "none" }}
+				id="bottom-out"
 			/>
 		</div>
 	);
@@ -88,23 +130,12 @@ const nodeTypes = {
 };
 
 export function CrossChainVisualization() {
-	// Define the initial nodes
+	// Simplified nodes focusing on key networks
 	const initialNodes: Node[] = [
-		{
-			id: "yellow",
-			type: "networkNode",
-			position: { x: 400, y: 200 },
-			data: {
-				label: "Yellow Network",
-				symbol: "YELLOW",
-				color: "bg-yellow-500",
-				isHub: true
-			}
-		},
 		{
 			id: "ethereum",
 			type: "networkNode",
-			position: { x: 200, y: 50 },
+			position: { x: 200, y: 100 },
 			data: {
 				label: "Ethereum",
 				symbol: "ETH",
@@ -112,29 +143,9 @@ export function CrossChainVisualization() {
 			}
 		},
 		{
-			id: "polygon",
-			type: "networkNode",
-			position: { x: 600, y: 50 },
-			data: {
-				label: "Polygon",
-				symbol: "MATIC",
-				color: "bg-purple-500"
-			}
-		},
-		{
-			id: "arbitrum",
-			type: "networkNode",
-			position: { x: 100, y: 200 },
-			data: {
-				label: "Arbitrum",
-				symbol: "ARB",
-				color: "bg-cyan-500"
-			}
-		},
-		{
 			id: "bnb",
 			type: "networkNode",
-			position: { x: 700, y: 200 },
+			position: { x: 600, y: 100 },
 			data: {
 				label: "BNB Chain",
 				symbol: "BNB",
@@ -142,88 +153,59 @@ export function CrossChainVisualization() {
 			}
 		},
 		{
-			id: "optimism",
+			id: "polygon",
 			type: "networkNode",
-			position: { x: 200, y: 350 },
+			position: { x: 400, y: 100 },
 			data: {
-				label: "Optimism",
-				symbol: "OP",
-				color: "bg-red-500"
+				label: "Polygon",
+				symbol: "MATIC",
+				color: "bg-purple-500"
 			}
 		},
 		{
-			id: "avalanche",
+			id: "yellow",
 			type: "networkNode",
-			position: { x: 600, y: 350 },
+			position: { x: 400, y: 300 },
 			data: {
-				label: "Avalanche",
-				symbol: "AVAX",
-				color: "bg-red-600"
+				label: "Yellow Network",
+				symbol: "YELLOW",
+				color: "bg-yellow-500",
+				isHub: true
 			}
 		}
 	];
 
-	// Define the initial edges
+	// Simplified edges showing key paths to Yellow Network
 	const initialEdges: Edge[] = [
+		// Direct connections to Yellow Network (fastest & cheapest)
 		{
 			id: "e-yellow-ethereum",
 			source: "yellow",
 			target: "ethereum",
 			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
+			style: { stroke: "#10b981", strokeWidth: 3 },
 			markerEnd: {
 				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
-		},
-		{
-			id: "e-yellow-polygon",
-			source: "yellow",
-			target: "polygon",
-			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
-			markerEnd: {
-				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
-		},
-		{
-			id: "e-yellow-arbitrum",
-			source: "yellow",
-			target: "arbitrum",
-			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
-			markerEnd: {
-				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
+				color: "#10b981"
+			},
+			label: "Fastest Route"
 		},
 		{
 			id: "e-yellow-bnb",
 			source: "yellow",
 			target: "bnb",
 			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
+			style: { stroke: "#f59e0b", strokeWidth: 3 },
 			markerEnd: {
 				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
+				color: "#f59e0b"
+			},
+			label: "Cheapest Route"
 		},
 		{
-			id: "e-yellow-optimism",
+			id: "e-yellow-polygon",
 			source: "yellow",
-			target: "optimism",
-			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
-			markerEnd: {
-				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
-		},
-		{
-			id: "e-yellow-avalanche",
-			source: "yellow",
-			target: "avalanche",
+			target: "polygon",
 			animated: true,
 			style: { stroke: "#facc15", strokeWidth: 2 },
 			markerEnd: {
@@ -237,7 +219,7 @@ export function CrossChainVisualization() {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
 	return (
-		<div className="w-full bg-gradient-to-b from-background to-gray-50 py-24">
+		<div className="w-full bg-background py-24">
 			<div className="container mx-auto px-6">
 				<div className="text-center mb-16">
 					<motion.h2
@@ -263,7 +245,7 @@ export function CrossChainVisualization() {
 					initial={{ opacity: 0, scale: 0.95 }}
 					whileInView={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.8 }}
-					className="bg-white rounded-2xl shadow-xl overflow-hidden"
+					className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
 					style={{ height: "500px" }}
 				>
 					<ReactFlow
@@ -276,7 +258,7 @@ export function CrossChainVisualization() {
 						proOptions={{ hideAttribution: true }}
 						defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
 					>
-						<Background color="#f0f0f0" gap={20} />
+						<Background color="#374151" gap={20} />
 						<Controls />
 						<MiniMap
 							nodeColor={(node) => {
@@ -285,6 +267,10 @@ export function CrossChainVisualization() {
 							}}
 							pannable
 							zoomable
+							style={{
+								backgroundColor: '#1f2937',
+								border: '1px solid #374151'
+							}}
 						/>
 					</ReactFlow>
 				</motion.div>
@@ -296,9 +282,9 @@ export function CrossChainVisualization() {
 					whileInView={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8, delay: 0.3 }}
 				>
-					<div className="text-center p-6 bg-white rounded-lg shadow-sm border border-yellow-200">
-						<div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-							<Zap className="w-6 h-6 text-yellow-600" />
+					<div className="text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+						<div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+							<Zap className="w-6 h-6 text-yellow-500" />
 						</div>
 						<h3 className="font-semibold text-foreground mb-2">Lightning Fast</h3>
 						<p className="text-sm text-muted-foreground">
@@ -306,9 +292,9 @@ export function CrossChainVisualization() {
 						</p>
 					</div>
 
-					<div className="text-center p-6 bg-white rounded-lg shadow-sm border border-yellow-200">
-						<div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-							<Shield className="w-6 h-6 text-yellow-600" />
+					<div className="text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+						<div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+							<Shield className="w-6 h-6 text-yellow-500" />
 						</div>
 						<h3 className="font-semibold text-foreground mb-2">Bridge-less Security</h3>
 						<p className="text-sm text-muted-foreground">
@@ -316,9 +302,9 @@ export function CrossChainVisualization() {
 						</p>
 					</div>
 
-					<div className="text-center p-6 bg-white rounded-lg shadow-sm border border-yellow-200">
-						<div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-							<Clock className="w-6 h-6 text-yellow-600" />
+					<div className="text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+						<div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+							<Clock className="w-6 h-6 text-yellow-500" />
 						</div>
 						<h3 className="font-semibold text-foreground mb-2">Real-time Routing</h3>
 						<p className="text-sm text-muted-foreground">
@@ -334,7 +320,7 @@ export function CrossChainVisualization() {
 					whileInView={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8, delay: 0.5 }}
 				>
-					<button className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:shadow-lg transition-shadow duration-300">
+					<button className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:shadow-lg transition-all duration-300 hover:scale-105">
 						<span>Start Routing Cross-Chain</span>
 						<ArrowRight className="w-4 h-4" />
 					</button>
