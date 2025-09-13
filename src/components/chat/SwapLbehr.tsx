@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { getTokenCore, getBaseCore } from "@/constants/tokenInfo";
+import { getToken, getBaseTokens } from "@/constants/tokenInfo";
 import {
 	ChainId,
 	Token,
@@ -28,15 +28,15 @@ import { abiApprouve } from "@/constants/abi";
 export default function SwapComponent() {
 	const { data, sendTransaction } = useSendTransaction ();
 	const [selectedOption1, setSelectedOption1] = useState<string>('USDC');
-	const [selectedOption2, setSelectedOption2] = useState<string>('WCORE');
+	const [selectedOption2, setSelectedOption2] = useState<string>('YELLOW');
 	const [amount, setAmount] = useState<string>("0");
 	const { address, chainId } = useAccount();
 	const { LBRouterV22ABI } = jsonAbis;
 	const CHAIN_ID = 1116;
 	const router = LB_ROUTER_V22_ADDRESS[CHAIN_ID];
-	const BASES = [getTokenCore("WCORE"), getTokenCore("USDC"), getTokenCore("USDT")];
-	const inputToken = getTokenCore(selectedOption1);
-	const outputToken = getTokenCore(selectedOption2);
+	const BASES = [getToken("YELLOW"), getToken("USDC"), getToken("USDT")];
+	const inputToken = getToken(selectedOption1);
+	const outputToken = getToken(selectedOption2);
 	const isExactIn = true;
 	const typedValueIn = amount;
 	const typedValueInParsed = parseUnits(typedValueIn, inputToken.decimals);
@@ -82,10 +82,10 @@ export default function SwapComponent() {
 	function approveToken(token: string, amount: string) {
 		try {
 			writeApproval({
-				address: getTokenCore(token).address as Address,
+				address: getToken(token).address as Address,
 				abi: abiApprouve,
 				functionName: "approve",
-				args: [router, parseUnits(amount, getTokenCore(token).decimals)],
+				args: [router, parseUnits(amount, getToken(token).decimals)],
 			});
 		} catch (error) {
 			console.error("❌ Approve failed:", error);
@@ -146,7 +146,7 @@ export default function SwapComponent() {
 		}
 	}
 
-	const word = ["USDC", "USDT", "WCORE"];
+	const word = ["USDC", "USDT", "YELLOW"];
 
 	const handleSelect1Change = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedOption1(e.target.value);

@@ -19,8 +19,8 @@ const config = {
   	},
   	extend: {
   		colors: {
-  			core: 'hsl(var(--core))',
-  			coreblack: 'hsl(var(--coreblack))',
+  			'yellow-primary': 'hsl(var(--yellow-primary))',
+  			'yellow-dark': 'hsl(var(--yellow-dark))',
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

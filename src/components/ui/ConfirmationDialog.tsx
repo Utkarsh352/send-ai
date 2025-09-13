@@ -23,7 +23,7 @@ interface ConfirmationDialogProps {
 
 // Simple dictionary to map token names to addresses
 const tokenAddresses: Record<string, string> = {
-	CORE: "0xCore1234567890abcdef0000000000000000000000",
+	YELLOW: "0x40375c92d9faf44d2f9db9bd9ba41a3317a2404f",
 	USDC: "0xUsdc1234567890abcdef0000000000000000000000",
 	// ... add more if needed
 };
@@ -227,7 +227,7 @@ export function ConfirmationDialog({
 					</Button>
 					<Button
 						variant="destructive"
-						className="bg-core hover:bg-core hover:opacity-90"
+						className="bg-yellow-primary hover:bg-yellow-primary hover:opacity-90"
 						onClick={handleConfirm}
 					>
 						Confirm

@@ -11,14 +11,14 @@ function copyToClipboard(text: string) {
 
 export default function CardList() {
   const cards = [
-    "Send 0.2 CORE to 0x578dC842Bb55bb8b73472d69Fa2097ed1C19c46a",
-    "How much CORE do I have remaining?",
-    "Swap 10 USDC for CORE",
-    "What is the value of 10 CORE in USD?",
+    "Send 0.2 YELLOW to 0x578dC842Bb55bb8b73472d69Fa2097ed1C19c46a",
+    "How much YELLOW do I have remaining?",
+    "Swap 10 USDC for YELLOW",
+    "What is the value of 10 YELLOW in USD?",
   ];
 
   return (
-    <div className="w-full text-core grid grid-cols-2 gap-4 mt-20">
+    <div className="w-full grid grid-cols-2 gap-4 mt-20">
       {cards.map((text, index) => (
         <Card
           key={index}

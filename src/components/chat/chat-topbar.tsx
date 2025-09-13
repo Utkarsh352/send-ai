@@ -50,7 +50,7 @@ export default function ChatTopbar({
 		toast(isLocal ? "Private Mode enabled" : "Private Mode disabled", {
 			description: `You have switched to ${isLocal ? "private" : "public"} mode.`,
 			duration: 3000,
-			className: "bg-core",
+			className: "bg-yellow-primary",
 		});
 	}
 
@@ -120,7 +120,7 @@ export default function ChatTopbar({
 					/>
 					{
 						isLocal ?
-							<Label htmlFor="airplane-mode" className="text-core">Private mode</Label> :
+							<Label htmlFor="airplane-mode" className="text-yellow-primary">Private mode</Label> :
 							<Label htmlFor="airplane-mode" className="text-muted-foreground">Private mode</Label>
 					}
 				</div>

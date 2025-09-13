@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --core: 360 78% 58%;
-    --coreblack: 0, 30%, 20%;
+    --yellow-primary: 45 93% 58%;
+    --yellow-dark: 45 100% 20%;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -29,8 +29,8 @@
   }
 
   .dark {
-    --core: 360 78% 58%;
-    --coreblack: 0, 30%, 20%;
+    --yellow-primary: 45 93% 58%;
+    --yellow-dark: 45 100% 20%;
     --background: 0 0% 9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 12%;

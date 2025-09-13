@@ -1,35 +1,35 @@
 export const INITIAL_QUESTIONS = [
   {
-    content: "Show me my CORE token balance",
+    content: "Show me my YELLOW token balance",
   },
   {
-    content: "Swap 50 USDC to CORE tokens",
+    content: "Swap 50 USDC to ETH",
   },
   {
-    content: "Send 10 CORE to another wallet address",
+    content: "Send 10 USDC to Polygon network",
   },
   {
-    content: "What are the current gas fees on Core blockchain?",
+    content: "What are the current gas fees on Ethereum?",
   },
   {
-    content: "Convert my USDT to WCORE",
+    content: "Convert my USDT to YELLOW",
   },
   {
     content: "Check my transaction history",
   },
   {
-    content: "What's the current CORE token price?",
+    content: "What's the current YELLOW token price?",
   },
   {
-    content: "Help me bridge assets to Core network",
+    content: "Help me bridge assets to Yellow Network",
   },
   {
-    content: "Show available DeFi protocols on Core",
+    content: "Show available DeFi protocols on Yellow Network",
   },
   {
-    content: "Explain how to stake CORE tokens",
+    content: "Explain how cross-chain routing works",
   },
   {
-    content: "Find the best yield farming opportunities",
+    content: "Find the best cross-chain transaction routes",
   },
 ];

@@ -30,7 +30,7 @@ export default function SwapComponent() {
   const { LBRouterV22ABI } = jsonAbis;
   const CHAIN_ID = 1116;
   const router = LB_ROUTER_V22_ADDRESS[CHAIN_ID];
-  const WCORE = WNATIVE[CHAIN_ID];
+  const WETH = WNATIVE[CHAIN_ID];
   const USDC = new Token(
     CHAIN_ID,
     "0xB6076C93701D6a07266c31066B298AeC6dd65c2d",
@@ -47,9 +47,9 @@ export default function SwapComponent() {
     "Tether USD"
   );
 
-  const BASES = [WCORE, USDC, USDT];
+  const BASES = [WETH, USDC, USDT];
   const inputToken = USDC;
-  const outputToken = WCORE;
+  const outputToken = WETH;
   const isExactIn = true;
   const typedValueIn = "20";
   const typedValueInParsed = parseUnits(typedValueIn, inputToken.decimals);

@@ -52,8 +52,8 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 			console.error(error.cause);
 		},
 		onToolCall: (tool) => {
-			if (tool.toolCall.toolName == "getCoreBalance") {
-				toast("Checking your CORE balance...");
+			if (tool.toolCall.toolName == "getYellowBalance") {
+				toast("Checking your YELLOW balance...");
 				// here get the balance from the wallet
 			}
 		}

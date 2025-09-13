@@ -25,7 +25,7 @@ import { useAccount, useBalance, useSendTransaction, useWaitForTransactionReceip
 import ToolExecutor from "./ToolExecutor";
 import { createPublicClient, http, parseEther, parseUnits } from "viem";
 import { abiApprouve } from "@/constants/abi";
-import { getTokenCore } from "@/constants/tokenInfo";
+import { getToken } from "@/constants/tokenInfo";
 import {
 	ChainId,
 	Token,
@@ -186,7 +186,7 @@ function ChatMessage({
 									});
 									return JSON.stringify({
 										message: "Transaction sent!",
-										amount: `${amount} CORE`,
+										amount: `${amount} ETH`,
 										from: address,
 										to,
 										hash,
@@ -238,14 +238,14 @@ function ChatMessage({
 									// 2. Set chain and token details.
 									const CHAIN_ID = 43113;
 									const router = LB_ROUTER_V22_ADDRESS[CHAIN_ID];
-									const inputToken = getTokenCore("USDC");
-									const outputToken = getTokenCore("WCORE");
+									const inputToken = getToken("USDC");
+									const outputToken = getToken("YELLOW");
 									const typedValueParsed = parseUnits(typedValue, inputToken.decimals);
 									const amountIn = new TokenAmount(inputToken, typedValueParsed);
 									const BASES = [
-										getTokenCore("WCORE"),
-										getTokenCore("USDC"),
-										getTokenCore("USDT"),
+										getToken("YELLOW"),
+										getToken("USDC"),
+										getToken("USDT"),
 									];
 
 									// 3. Create token pairs and routes.
@@ -264,7 +264,7 @@ function ChatMessage({
 
 									// 5. Approve USDC for the router.
 									const approvalTx = await writeContractAsync({
-										address: getTokenCore("USDC").address as Address,
+										address: getToken("USDC").address as Address,
 										abi: abiApprouve,
 										functionName: "approve",
 										args: [router, typedValueParsed],
