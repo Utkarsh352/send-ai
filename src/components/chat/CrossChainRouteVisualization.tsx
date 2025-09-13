@@ -5,6 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock, DollarSign, Shield, Zap, Route, Network } from "lucide-react";
+import {
+	ReactFlow,
+	Node,
+	Edge,
+	Background,
+	Controls,
+	useNodesState,
+	useEdgesState,
+	Handle,
+	Position,
+	NodeProps,
+	MarkerType,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { motion } from "framer-motion";
 
 interface RouteStep {
 	step: number;
@@ -33,6 +48,53 @@ interface RouteVisualizationProps {
 	onSelectRoute: (routeId: string) => void;
 }
 
+// Custom node component for route visualization
+const RouteNode: React.FC<NodeProps> = ({ data }) => {
+	return (
+		<div className="relative">
+			<Handle
+				type="target"
+				position={Position.Left}
+				style={{ background: "#555", border: "none" }}
+			/>
+			<motion.div
+				initial={{ scale: 0 }}
+				animate={{ scale: 1 }}
+				transition={{ duration: 0.3 }}
+				className={`
+					px-3 py-2 rounded-lg shadow-md border cursor-pointer
+					transition-all duration-300 hover:shadow-lg hover:scale-105
+					${data.isYellow ? 'border-yellow-400 bg-yellow-500/10' : 'border-border bg-card'}
+				`}
+				style={{ minWidth: '100px' }}
+			>
+				<div className="flex flex-col items-center gap-1">
+					<div className={`
+						w-8 h-8 rounded-full flex items-center justify-center
+						${data.color} shadow-sm text-xs font-bold text-white
+					`}>
+						{data.symbol}
+					</div>
+					<div className="text-center">
+						<div className="font-medium text-xs text-foreground">
+							{data.label}
+						</div>
+					</div>
+				</div>
+			</motion.div>
+			<Handle
+				type="source"
+				position={Position.Right}
+				style={{ background: "#555", border: "none" }}
+			/>
+		</div>
+	);
+};
+
+const nodeTypes = {
+	routeNode: RouteNode,
+};
+
 export function CrossChainRouteVisualization({
 	routes,
 	recommendation,
@@ -42,6 +104,102 @@ export function CrossChainRouteVisualization({
 	amount,
 	onSelectRoute
 }: RouteVisualizationProps) {
+	// Create nodes and edges for the interactive graph
+	const createInteractiveGraph = () => {
+		const nodes: Node[] = [];
+		const edges: Edge[] = [];
+
+		// Source chain node
+		nodes.push({
+			id: "source",
+			type: "routeNode",
+			position: { x: 50, y: 120 },
+			data: {
+				label: fromChain.charAt(0).toUpperCase() + fromChain.slice(1),
+				symbol: token.slice(0, 2),
+				color: "bg-blue-500"
+			}
+		});
+
+		// Destination chain node
+		nodes.push({
+			id: "destination",
+			type: "routeNode",
+			position: { x: 600, y: 120 },
+			data: {
+				label: toChain.charAt(0).toUpperCase() + toChain.slice(1),
+				symbol: token.slice(0, 2),
+				color: "bg-purple-500"
+			}
+		});
+
+		// Add intermediate nodes for each unique route provider
+		const uniqueProviders = Array.from(new Set(routes.map(r => r.provider)));
+		uniqueProviders.forEach((provider, index) => {
+			const isYellow = provider.toLowerCase().includes('yellow');
+			const yPosition = 50 + (index * 100); // Stagger vertically
+
+			nodes.push({
+				id: `provider-${index}`,
+				type: "routeNode",
+				position: { x: 325, y: yPosition },
+				data: {
+					label: provider,
+					symbol: provider.slice(0, 2),
+					color: isYellow ? "bg-yellow-500" : "bg-gray-500",
+					isYellow
+				}
+			});
+
+			// Find the route for this provider
+			const route = routes.find(r => r.provider === provider);
+			if (route) {
+				const isRecommended = route.id === recommendation.id;
+				const edgeColor = isRecommended ? "#10b981" :
+								 isYellow ? "#f59e0b" : "#94a3b8";
+
+				// Edge from source to provider
+				edges.push({
+					id: `edge-to-${index}`,
+					source: "source",
+					target: `provider-${index}`,
+					animated: true,
+					style: {
+						stroke: edgeColor,
+						strokeWidth: isRecommended ? 3 : 2
+					},
+					markerEnd: {
+						type: MarkerType.ArrowClosed,
+						color: edgeColor
+					},
+					label: isRecommended ? "Recommended" : undefined
+				});
+
+				// Edge from provider to destination
+				edges.push({
+					id: `edge-from-${index}`,
+					source: `provider-${index}`,
+					target: "destination",
+					animated: true,
+					style: {
+						stroke: edgeColor,
+						strokeWidth: isRecommended ? 3 : 2
+					},
+					markerEnd: {
+						type: MarkerType.ArrowClosed,
+						color: edgeColor
+					}
+				});
+			}
+		});
+
+		return { nodes, edges };
+	};
+
+	const { nodes: graphNodes, edges: graphEdges } = createInteractiveGraph();
+	const [nodes, setNodes, onNodesChange] = useNodesState(graphNodes);
+	const [edges, setEdges, onEdgesChange] = useEdgesState(graphEdges);
+
 	const getProviderIcon = (provider: string) => {
 		if (provider.toLowerCase().includes("yellow")) {
 			return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">Y</div>;
@@ -93,6 +251,50 @@ export function CrossChainRouteVisualization({
 					Found {routes.length} available routes • Recommended: <span className="font-semibold text-yellow-600">{recommendation.provider}</span>
 				</p>
 			</div>
+
+			{/* Interactive Route Graph */}
+			<Card className="bg-card border border-border">
+				<CardHeader>
+					<CardTitle className="text-lg flex items-center gap-2">
+						<Route className="w-5 h-5 text-yellow-500" />
+						Route Visualization
+					</CardTitle>
+					<CardDescription>
+						Interactive graph showing available routing paths and their relationships
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className="bg-background border border-border rounded-lg overflow-hidden" style={{ height: "300px" }}>
+						<ReactFlow
+							nodes={nodes}
+							edges={edges}
+							onNodesChange={onNodesChange}
+							onEdgesChange={onEdgesChange}
+							nodeTypes={nodeTypes}
+							fitView
+							proOptions={{ hideAttribution: true }}
+							defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+						>
+							<Background color="#374151" gap={20} />
+							<Controls />
+						</ReactFlow>
+					</div>
+					<div className="mt-4 flex flex-wrap gap-2 text-sm">
+						<div className="flex items-center gap-2">
+							<div className="w-3 h-0.5 bg-green-500"></div>
+							<span className="text-muted-foreground">Recommended Route</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="w-3 h-0.5 bg-orange-500"></div>
+							<span className="text-muted-foreground">Yellow Network</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="w-3 h-0.5 bg-gray-500"></div>
+							<span className="text-muted-foreground">Alternative Routes</span>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
 
 			{/* Routes List */}
 			<div className="space-y-4">

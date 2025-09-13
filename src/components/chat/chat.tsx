@@ -12,6 +12,7 @@ import ChatList from "./chat-list";
 import ChatTopbar from "./chat-topbar";
 import { Card, CardContent } from "../ui/card";
 import CardList  from "./CardList";
+import QuickActionsForm from "./QuickActionsForm";
 import { useAccount } from "wagmi";
 
 export interface ChatProps {
@@ -84,7 +85,6 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 
 		setLoadingSubmit(true);
 
-
 		const requestOptions: ChatRequestOptions = {
 			body: {
 				isLocal: isLocal,
@@ -92,6 +92,33 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 		};
 
 		handleSubmit(e, requestOptions);
+		saveMessages(id, [...messages, userMessage]);
+	};
+
+	const onSubmitPrompt = (prompt: string) => {
+		window.history.replaceState({}, "", `/c/${id}`);
+
+		const userMessage: Message = {
+			id: generateId(),
+			role: "user",
+			content: prompt,
+		};
+
+		setLoadingSubmit(true);
+		setInput(prompt);
+
+		const requestOptions: ChatRequestOptions = {
+			body: {
+				isLocal: isLocal,
+			},
+		};
+
+		// Create a synthetic form event
+		const syntheticEvent = {
+			preventDefault: () => {},
+		} as React.FormEvent<HTMLFormElement>;
+
+		handleSubmit(syntheticEvent, requestOptions);
 		saveMessages(id, [...messages, userMessage]);
 	};
 
@@ -139,8 +166,11 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 						isToolInProgress={isToolInProgress}
 						isMiddle={true}
 					/>
-					
-					<CardList />
+
+					<QuickActionsForm
+						onSubmitPrompt={onSubmitPrompt}
+						isLoading={isLoading || loadingSubmit}
+					/>
 
 				
 
