@@ -1,0 +1,231 @@
+"use client";
+
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Clock, DollarSign, Shield, Zap, Route, Network } from "lucide-react";
+
+interface RouteStep {
+	step: number;
+	action: string;
+}
+
+interface CrossChainRoute {
+	id: string;
+	provider: string;
+	type: string;
+	estimatedTime: string;
+	estimatedCost: string;
+	steps: RouteStep[];
+	advantages: string[];
+	risks: string[];
+	confidence: number;
+}
+
+interface RouteVisualizationProps {
+	routes: CrossChainRoute[];
+	recommendation: CrossChainRoute;
+	fromChain: string;
+	toChain: string;
+	token: string;
+	amount: string;
+	onSelectRoute: (routeId: string) => void;
+}
+
+export function CrossChainRouteVisualization({
+	routes,
+	recommendation,
+	fromChain,
+	toChain,
+	token,
+	amount,
+	onSelectRoute
+}: RouteVisualizationProps) {
+	const getProviderIcon = (provider: string) => {
+		if (provider.toLowerCase().includes("yellow")) {
+			return <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">Y</div>;
+		}
+		if (provider.toLowerCase().includes("bridge")) {
+			return <Network className="w-6 h-6 text-blue-500" />;
+		}
+		return <Route className="w-6 h-6 text-purple-500" />;
+	};
+
+	const getTypeColor = (type: string) => {
+		if (type.toLowerCase().includes("state channel")) return "bg-yellow-100 text-yellow-800";
+		if (type.toLowerCase().includes("traditional")) return "bg-blue-100 text-blue-800";
+		return "bg-purple-100 text-purple-800";
+	};
+
+	const getConfidenceColor = (confidence: number) => {
+		if (confidence >= 90) return "text-green-600";
+		if (confidence >= 75) return "text-yellow-600";
+		return "text-orange-600";
+	};
+
+	return (
+		<div className="space-y-6">
+			{/* Route Header */}
+			<div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
+				<div className="flex items-center justify-center space-x-4 mb-4">
+					<div className="text-center">
+						<div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mb-2">
+							{fromChain.charAt(0).toUpperCase()}
+						</div>
+						<p className="text-sm font-medium capitalize">{fromChain}</p>
+					</div>
+					<ArrowRight className="w-8 h-8 text-gray-400" />
+					<div className="text-center px-4">
+						<div className="bg-white px-3 py-2 rounded-full border-2 border-dashed border-gray-300">
+							<span className="text-lg font-bold">{amount} {token}</span>
+						</div>
+					</div>
+					<ArrowRight className="w-8 h-8 text-gray-400" />
+					<div className="text-center">
+						<div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mb-2">
+							{toChain.charAt(0).toUpperCase()}
+						</div>
+						<p className="text-sm font-medium capitalize">{toChain}</p>
+					</div>
+				</div>
+				<p className="text-center text-gray-600">
+					Found {routes.length} available routes • Recommended: <span className="font-semibold text-yellow-600">{recommendation.provider}</span>
+				</p>
+			</div>
+
+			{/* Routes List */}
+			<div className="space-y-4">
+				{routes.map((route, index) => (
+					<Card key={route.id} className={`transition-all duration-200 hover:shadow-lg ${
+						route.id === recommendation.id ? 'ring-2 ring-yellow-500 bg-yellow-50' : ''
+					}`}>
+						<CardHeader className="pb-3">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center space-x-3">
+									{getProviderIcon(route.provider)}
+									<div>
+										<CardTitle className="text-lg">{route.provider}</CardTitle>
+										<CardDescription>
+											<Badge variant="secondary" className={getTypeColor(route.type)}>
+												{route.type}
+											</Badge>
+										</CardDescription>
+									</div>
+								</div>
+								<div className="flex items-center space-x-4 text-sm">
+									<div className="flex items-center space-x-1 text-gray-600">
+										<Clock className="w-4 h-4" />
+										<span>{route.estimatedTime}</span>
+									</div>
+									<div className="flex items-center space-x-1 text-gray-600">
+										<DollarSign className="w-4 h-4" />
+										<span>{route.estimatedCost}</span>
+									</div>
+									<div className="flex items-center space-x-1">
+										<Shield className="w-4 h-4" />
+										<span className={`font-medium ${getConfidenceColor(route.confidence)}`}>
+											{route.confidence}%
+										</span>
+									</div>
+								</div>
+							</div>
+							{route.id === recommendation.id && (
+								<Badge variant="default" className="w-fit bg-yellow-500 text-black">
+									<Zap className="w-3 h-3 mr-1" />
+									Recommended
+								</Badge>
+							)}
+						</CardHeader>
+						
+						<CardContent className="space-y-4">
+							{/* Route Steps */}
+							<div>
+								<h4 className="font-medium mb-2">Transaction Steps:</h4>
+								<div className="space-y-2">
+									{route.steps.map((step) => (
+										<div key={step.step} className="flex items-start space-x-3">
+											<div className="w-6 h-6 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
+												{step.step}
+											</div>
+											<p className="text-sm text-gray-700 flex-1">{step.action}</p>
+										</div>
+									))}
+								</div>
+							</div>
+
+							{/* Advantages and Risks */}
+							<div className="grid md:grid-cols-2 gap-4">
+								<div>
+									<h4 className="font-medium mb-2 text-green-700">Advantages:</h4>
+									<ul className="space-y-1">
+										{route.advantages.map((advantage, i) => (
+											<li key={i} className="text-sm text-green-600 flex items-start space-x-1">
+												<span className="text-green-500 mt-1">•</span>
+												<span>{advantage}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+								<div>
+									<h4 className="font-medium mb-2 text-orange-700">Considerations:</h4>
+									<ul className="space-y-1">
+										{route.risks.map((risk, i) => (
+											<li key={i} className="text-sm text-orange-600 flex items-start space-x-1">
+												<span className="text-orange-500 mt-1">•</span>
+												<span>{risk}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							</div>
+
+							{/* Action Button */}
+							<div className="pt-2">
+								<Button 
+									onClick={() => onSelectRoute(route.id)}
+									className={`w-full ${
+										route.id === recommendation.id 
+											? 'bg-yellow-500 hover:bg-yellow-600 text-black' 
+											: 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+									}`}
+								>
+									{route.id === recommendation.id ? 'Use Recommended Route' : 'Select This Route'}
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
+				))}
+			</div>
+
+			{/* Route Comparison Summary */}
+			<Card className="bg-gray-50">
+				<CardHeader>
+					<CardTitle className="text-lg">Route Comparison</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="grid md:grid-cols-3 gap-4 text-sm">
+						<div>
+							<h4 className="font-medium mb-2">🚀 Fastest Route</h4>
+							<p className="text-gray-600">{routes.reduce((fastest, route) => 
+								parseInt(route.estimatedTime) < parseInt(fastest.estimatedTime) ? route : fastest
+							).provider}</p>
+						</div>
+						<div>
+							<h4 className="font-medium mb-2">💰 Cheapest Route</h4>
+							<p className="text-gray-600">{routes.reduce((cheapest, route) => 
+								parseFloat(route.estimatedCost.replace('$', '')) < parseFloat(cheapest.estimatedCost.replace('$', '')) ? route : cheapest
+							).provider}</p>
+						</div>
+						<div>
+							<h4 className="font-medium mb-2">🛡️ Most Secure</h4>
+							<p className="text-gray-600">{routes.reduce((secure, route) => 
+								route.confidence > secure.confidence ? route : secure
+							).provider}</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
