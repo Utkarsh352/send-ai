@@ -38,6 +38,7 @@
     "@traderjoe-xyz/sdk-v2": "^3.0.21",
     "@types/dom-speech-recognition": "^0.0.4",
     "@wagmi/core": "^2.16.4",
+    "@xyflow/react": "^12.8.4",
     "ai": "^4.1.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

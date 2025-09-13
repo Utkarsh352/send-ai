@@ -9,10 +9,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: "Send-AI",
-	description: "Google Maps for Cross-Chain Transactions powered by Yellow Network & AI",
+	description: "Maps for Cross-Chain Transactions powered by Yellow Network & AI",
 	icons: {
 		icon: [
-			{ rel: "icon", url: "/black_logo.svg", type: "image/svg+xml" },
+			{ rel: "icon", url: "/yellow_logo.svg", type: "image/svg+xml" },
 		]
 	}
 };

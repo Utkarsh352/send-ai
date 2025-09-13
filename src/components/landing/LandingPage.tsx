@@ -19,6 +19,7 @@ import { LampContainer } from "../ui/lamp";
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import { Loader2, Plus } from "lucide-react";
+import { CrossChainVisualization } from "./CrossChainVisualization";
 
 export default function LandingPage() {
 	const chainId = useChainId();
@@ -51,7 +52,7 @@ export default function LandingPage() {
 					}}
 					className="bg-gradient-to-t pb-4 z-40 font-bold from-neutral-400 to-neutral-100  bg-clip-text text-transparent text-4xl tracking-tight md:text-7xl text-center leading-[1.2]"
 				>
-					Google Maps for Cross-Chain
+					Maps for Cross-Chain Transactions
 				</motion.h1>
 
 				<p className="font-normal text-lg text-muted-foreground tracking-normal mt-1 mb-8 max-w-xl mx-auto text-center">
@@ -82,13 +83,15 @@ export default function LandingPage() {
 				{/* Example Chat Prompt */}
 				<div className="mt-12 w-full mx-auto">
 					<div className="flex items-center gap-4 mb-4">
-						<Image
-							src="/red_logo.svg"
-							alt="Send-AI Logo"
-							width={32}
-							height={32}
-							className="h-8 w-8 object-contain"
-						/>
+						<div className="relative">
+							<div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
+								<svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+									<path d="M2 8L8 2L14 8L8 14L2 8Z" fill="white"/>
+									<path d="M8 4L12 8L8 12L4 8L8 4Z" fill="rgba(0,0,0,0.2)"/>
+								</svg>
+							</div>
+							<div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+						</div>
 						<p className="text-lg text-muted-foreground">
 							Where would you like to send your assets across chains?
 						</p>
@@ -115,7 +118,7 @@ export default function LandingPage() {
 			<div className="container items-center max-w-lg text-center flex flex-col w-full mt-24 mb-48">
 				<p className="relative -mb-2 z-20 bg-gradient-to-b text-yellow-500 bg-clip-text py-8 text-4xl font-thin sm:text-7xl">Send-AI</p>
 				<p className="text-lg font-light text-foreground">
-					<span className="text-yellow-500 font-semibold">Cross</span>-chain <span className="text-yellow-500 font-semibold">Route</span> optimization powered by <span className="text-yellow-500 font-semibold">A</span>rtificial <span className="text-yellow-500 font-semibold">I</span>ntelligence
+					<span className="text-yellow-500 font-semibold">Maps</span> for <span className="text-yellow-500 font-semibold">Cross</span>-chain transactions powered by <span className="text-yellow-500 font-semibold">A</span>rtificial <span className="text-yellow-500 font-semibold">I</span>ntelligence
 				</p>
 			</div>
 
@@ -157,7 +160,7 @@ export default function LandingPage() {
 							<p className="text-base text-muted-foreground mt-2">
 								Cross-chain transactions are fragmented across hundreds of bridges and protocols, each with different risks and costs.
 								We&apos;re committed to making cross-chain finance accessible to <strong>all users</strong>.
-								Like Google Maps finds the best driving routes, Send-AI finds the optimal paths for moving assets across blockchains,
+								Like navigation apps find the best driving routes, Send-AI finds the optimal paths for moving assets across blockchains,
 								saving you time, money, and reducing the complexity of multi-chain DeFi.
 							</p>
 						</AccordionContent>
@@ -165,11 +168,10 @@ export default function LandingPage() {
 				</Accordion>
 			</div>
 
-
+			{/* Cross-Chain Visualization */}
+			<CrossChainVisualization />
 
 			{/* Footer */}
-
-
 			<footer className="m-8 text-sm opacity-70 pb-8">
 				Powered by Yellow Network • Cross-Chain Route Optimization & Artificial Intelligence
 			</footer>
