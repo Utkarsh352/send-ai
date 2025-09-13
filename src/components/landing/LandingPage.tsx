@@ -90,7 +90,7 @@ export default function LandingPage() {
 									<path d="M8 4L12 8L8 12L4 8L8 4Z" fill="rgba(0,0,0,0.2)"/>
 								</svg>
 							</div>
-							<div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+							<div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white"></div>
 						</div>
 						<p className="text-lg text-muted-foreground">
 							Where would you like to send your assets across chains?
