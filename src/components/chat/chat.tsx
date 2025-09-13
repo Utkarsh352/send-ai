@@ -48,9 +48,8 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 		},
 		onError: (error) => {
 			setLoadingSubmit(false);
-			router.replace("/");
-			console.error(error.message);
-			console.error(error.cause);
+			console.error("Chat error:", error.message);
+			console.error("Chat error cause:", error.cause);
 		},
 		onToolCall: (tool) => {
 			if (tool.toolCall.toolName == "getYellowBalance") {
@@ -75,7 +74,6 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		window.history.replaceState({}, "", `/c/${id}`);
 
 		const userMessage: Message = {
 			id: generateId(),
@@ -88,6 +86,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 		const requestOptions: ChatRequestOptions = {
 			body: {
 				isLocal: isLocal,
+				walletAddress: address,
 			},
 		};
 
@@ -96,8 +95,6 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 	};
 
 	const onSubmitPrompt = (prompt: string) => {
-		window.history.replaceState({}, "", `/c/${id}`);
-
 		const userMessage: Message = {
 			id: generateId(),
 			role: "user",
@@ -110,6 +107,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 		const requestOptions: ChatRequestOptions = {
 			body: {
 				isLocal: isLocal,
+				walletAddress: address,
 			},
 		};
 

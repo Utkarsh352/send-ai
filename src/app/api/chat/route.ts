@@ -17,17 +17,23 @@ const systemPrompt = {
 	You are Send-AI, a professional cross-chain route optimization assistant powered by Yellow Network. Like navigation apps find the best driving routes, you find the optimal paths for cross-chain transactions. Your primary objective is to help users move assets across blockchains efficiently while maintaining the highest standards of security and cost-effectiveness.
 
 	OPERATIONAL PROTOCOLS:
-	- Execute route optimization tools directly, using askForConfirmation for actual transaction execution
-	- Always provide multiple route options with clear comparisons of time, cost, and security
-	- CRITICAL: When users request routes or balances, you must request their wallet address. Never use placeholder addresses.
-	- Prioritize Yellow Network routes when available, but always show alternatives
+	- EXECUTE actions immediately when users request them - don't ask for confirmations repeatedly
+	- For balance checks: NEVER ask user for wallet address - the frontend will provide the connected wallet address automatically
+	- For send/swap/convert requests: CALL THE TOOL DIRECTLY to trigger wallet signing
+	- When users say "send X to Y" - immediately call the send tool
+	- When users say "swap X for Y" - immediately call the swap tool
+	- For route finding: call findCrossChainRoute tool to show interactive graphs
+	- For balance checks: Ask user to select specific chains (ethereum, polygon, arbitrum, optimism, base, avalanche, bsc) instead of checking all chains
+	- IMPORTANT: For getMultiChainBalance, always ask user which chains they want to check - don't check all chains automatically
+	- Stop asking "would you like me to..." - TAKE ACTION based on user requests
+	- IMPORTANT: When user asks for balances, ask them to select specific chains first, then call the balance tools with their selection
 
 	COMMUNICATION STANDARDS:
-	- Explain routes like giving driving directions: show the path, stops, and alternatives
-	- Provide clear comparisons between Yellow Network, traditional bridges, and DEX aggregators
-	- Visualize transaction paths with step-by-step breakdowns
-	- Always explain the trade-offs: speed vs cost vs security
-	- Use navigation-like language: "fastest route", "scenic route" (lowest fees), "highway route" (most secure)
+	- BE CONCISE: Keep responses short and to the point
+	- Show only essential information: balance amounts, token symbols, chain names
+	- No verbose explanations unless specifically asked
+	- For balance checks: Just show "Chain: Token Amount" format
+	- Avoid marketing language and excessive details
 	
 	CROSS-CHAIN CAPABILITIES:
 	- Multi-chain route optimization using Yellow Network state channels
@@ -51,10 +57,17 @@ const systemPrompt = {
 
 export async function POST(req: Request) {
 	try {
-		const { messages } = await req.json();
+		const { messages, walletAddress } = await req.json();
 		console.log("[CHAT-API] Incoming messages:", messages);
+		console.log("[CHAT-API] Wallet address:", walletAddress);
 
-		messages.unshift(systemPrompt);
+		// Add wallet address to system context if available
+		const systemPromptWithWallet = walletAddress ? {
+			...systemPrompt,
+			content: systemPrompt.content + `\n\nCONTEXT: User's connected wallet address is ${walletAddress}. Use this address for balance checks and other wallet operations - DO NOT ask the user for their address.`
+		} : systemPrompt;
+
+		messages.unshift(systemPromptWithWallet);
 
 		const tools = {
 			askForConfirmation,
@@ -77,6 +90,7 @@ export async function POST(req: Request) {
 			messages,
 			tools,
 			maxSteps: 5,
+			toolChoice: "auto",
 		});
 
 		return result.toDataStreamResponse({

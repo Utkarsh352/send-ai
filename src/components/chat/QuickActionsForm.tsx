@@ -124,7 +124,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 					<div className="space-y-4">
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="fromChain">From Chain</Label>
+								<Label htmlFor="fromChain" className="text-foreground">From Chain</Label>
 								<Select value={formData.fromChain} onValueChange={(value) => setFormData({...formData, fromChain: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select chain" />
@@ -137,7 +137,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 								</Select>
 							</div>
 							<div>
-								<Label htmlFor="toChain">To Chain</Label>
+								<Label htmlFor="toChain" className="text-foreground">To Chain</Label>
 								<Select value={formData.toChain} onValueChange={(value) => setFormData({...formData, toChain: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select chain" />
@@ -152,7 +152,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="token">Token</Label>
+								<Label htmlFor="token" className="text-foreground">Token</Label>
 								<Select value={formData.token} onValueChange={(value) => setFormData({...formData, token: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select token" />
@@ -165,7 +165,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 								</Select>
 							</div>
 							<div>
-								<Label htmlFor="amount">Amount</Label>
+								<Label htmlFor="amount" className="text-foreground">Amount</Label>
 								<Input
 									id="amount"
 									type="number"
@@ -176,7 +176,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 							</div>
 						</div>
 						<div>
-							<Label htmlFor="toAddress">To Address (Optional)</Label>
+							<Label htmlFor="toAddress" className="text-foreground">To Address (Optional)</Label>
 							<Input
 								id="toAddress"
 								placeholder="0x..."
@@ -192,7 +192,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 					<div className="space-y-4">
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="token">Token</Label>
+								<Label htmlFor="token" className="text-foreground">Token</Label>
 								<Select value={formData.token} onValueChange={(value) => setFormData({...formData, token: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select token" />
@@ -205,7 +205,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 								</Select>
 							</div>
 							<div>
-								<Label htmlFor="amount">Amount</Label>
+								<Label htmlFor="amount" className="text-foreground">Amount</Label>
 								<Input
 									id="amount"
 									type="number"
@@ -216,7 +216,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 							</div>
 						</div>
 						<div>
-							<Label htmlFor="toAddress">To Address</Label>
+							<Label htmlFor="toAddress" className="text-foreground">To Address</Label>
 							<Input
 								id="toAddress"
 								placeholder="0x..."
@@ -232,7 +232,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 					<div className="space-y-4">
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="swapFromToken">From Token</Label>
+								<Label htmlFor="swapFromToken" className="text-foreground">From Token</Label>
 								<Select value={formData.swapFromToken} onValueChange={(value) => setFormData({...formData, swapFromToken: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select token" />
@@ -245,7 +245,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 								</Select>
 							</div>
 							<div>
-								<Label htmlFor="swapToToken">To Token</Label>
+								<Label htmlFor="swapToToken" className="text-foreground">To Token</Label>
 								<Select value={formData.swapToToken} onValueChange={(value) => setFormData({...formData, swapToToken: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select token" />
@@ -259,7 +259,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 							</div>
 						</div>
 						<div>
-							<Label htmlFor="swapAmount">Amount</Label>
+							<Label htmlFor="swapAmount" className="text-foreground">Amount</Label>
 							<Input
 								id="swapAmount"
 								type="number"
@@ -288,7 +288,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 						<Card
 							key={action.id}
 							className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-2 ${
-								isActive ? 'border-yellow-500 bg-yellow-50 shadow-lg' : 'border-border hover:border-yellow-300'
+								isActive ? 'border-yellow-500 bg-yellow-500/10 shadow-lg' : 'border-border hover:border-yellow-300 bg-card'
 							}`}
 							onClick={() => handleQuickAction(action.id)}
 						>
@@ -298,7 +298,7 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 										<Icon className="w-5 h-5 text-white" />
 									</div>
 									<div>
-										<h3 className="font-medium text-sm">{action.title}</h3>
+										<h3 className="font-medium text-sm text-foreground">{action.title}</h3>
 										<p className="text-xs text-muted-foreground mt-1">{action.description}</p>
 									</div>
 								</div>
@@ -310,10 +310,10 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 
 			{/* Form for Selected Action */}
 			{activeForm && (
-				<Card className="border-yellow-300 bg-yellow-50">
+				<Card className="border-yellow-500 bg-card">
 					<CardHeader className="pb-3">
-						<CardTitle className="text-lg flex items-center gap-2">
-							{React.createElement(quickActions.find(a => a.id === activeForm)?.icon || Search, { className: "w-5 h-5" })}
+						<CardTitle className="text-lg flex items-center gap-2 text-foreground">
+							{React.createElement(quickActions.find(a => a.id === activeForm)?.icon || Search, { className: "w-5 h-5 text-yellow-500" })}
 							{quickActions.find(a => a.id === activeForm)?.title}
 						</CardTitle>
 					</CardHeader>
