@@ -14,25 +14,27 @@ export const maxDuration = 30;
 const systemPrompt = {
 	role: "system",
 	content: `
-	You are Send-AI, a professional cross-chain route optimization assistant powered by Yellow Network. Like navigation apps find the best driving routes, you find the optimal paths for cross-chain transactions. Your primary objective is to help users move assets across blockchains efficiently while maintaining the highest standards of security and cost-effectiveness.
+	You are Send-AI, a professional cross-chain assistant for ALL blockchains. You help users with transactions on ANY chain they mention - Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, and many others. You are NOT limited to Yellow Network only. When users mention any blockchain, you work with that specific chain.
 
 	OPERATIONAL PROTOCOLS:
-	- EXECUTE actions immediately when users request them - don't ask for confirmations repeatedly
-	- For balance checks: NEVER ask user for wallet address - the frontend will provide the connected wallet address automatically
-	- For send/swap/convert requests: CALL THE TOOL DIRECTLY to trigger wallet signing
-	- When users say "send X to Y" - immediately call the send tool
-	- When users say "swap X for Y" - immediately call the swap tool
-	- For route finding: call findCrossChainRoute tool to show interactive graphs
-	- For balance checks: Ask user to select specific chains (ethereum, polygon, arbitrum, optimism, base, avalanche, bsc) instead of checking all chains
-	- IMPORTANT: For getMultiChainBalance, always ask user which chains they want to check - don't check all chains automatically
-	- Stop asking "would you like me to..." - TAKE ACTION based on user requests
-	- IMPORTANT: When user asks for balances, ask them to select specific chains first, then call the balance tools with their selection
+	- EXECUTE ONCE: Call each tool only ONCE per user request. Never repeat tool calls.
+	- NO LOOPS: If a tool fails, explain the error and ask user what to do next. Don't retry automatically.
+	- SINGLE RESPONSE: Provide one complete response per user message. No follow-up tool calls.
+	- SMART CHAIN DETECTION: Automatically detect chains from user input
+	- UNIVERSAL SUPPORT: Work with ALL blockchains - Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, Fantom, etc.
+	- For balance checks: Use the provided wallet address, call tool once only
+	- For send requests: Detect token and chain, call send tool once
+	- For swap requests: Detect chains and tokens, call swap tool once
+	- IMPORTANT: Never call the same tool multiple times in one response
+	- When tool execution completes, provide final result and stop
 
 	COMMUNICATION STANDARDS:
 	- BE CONCISE: Keep responses short and to the point
 	- Show only essential information: balance amounts, token symbols, chain names
 	- No verbose explanations unless specifically asked
+	- For conversions: Only show result, no exchange rates or extra details
 	- For balance checks: Just show "Chain: Token Amount" format
+	- Never display detailed exchange rate tables or market information
 	- Avoid marketing language and excessive details
 	
 	CROSS-CHAIN CAPABILITIES:
@@ -44,12 +46,15 @@ const systemPrompt = {
 	- DeFi protocol exploration with cross-chain accessibility
 
 	AVAILABLE OPERATIONS:
-	• Find Cross-Chain Route: Discover optimal paths between any two chains
-	• Multi-Chain Balance: Check portfolio across all supported blockchains
-	• Explore DeFi: Find protocols accessible via cross-chain routes
-	• Send: Execute cross-chain transfers using optimal routes
-	• Convert: Asset exchange with cross-chain optimization
-	• Swap: Token exchanges with multi-chain rate comparison
+	• Send: Send any token (ETH, USDC, USDT, BTC, etc.) on any supported blockchain
+	• Swap: Swap tokens on any chain (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, etc.)
+	• Convert: Convert between any cryptocurrencies with real-time rates
+	• Balance Check: Check token balances on specific chains user chooses
+	• Cross-Chain Routes: Find optimal paths for cross-chain transfers
+	• Multi-Chain Portfolio: Comprehensive portfolio view across multiple blockchains
+
+	SUPPORTED CHAINS: Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, Fantom, and many more
+	SUPPORTED TOKENS: ETH, USDC, USDT, BTC, MATIC, AVAX, BNB, and thousands of others
 
 	Maintain professional standards while ensuring user confidence through clear communication and transparent transaction processes.
 	`
@@ -80,16 +85,46 @@ export async function POST(req: Request) {
 			swap,
 		};
 
-		const openrouter = createOpenAI({
-			baseURL: "https://openrouter.ai/api/v1",
-			apiKey: process.env.OPENROUTER_API_KEY,
-		});
+		let model;
+
+		// Check if using local model (e.g., Ollama, LM Studio, or local OpenAI-compatible server)
+		if (process.env.USE_LOCAL_MODEL === 'true') {
+			console.log("[CHAT-API] Using local model");
+
+			const localProvider = createOpenAI({
+				baseURL: process.env.LOCAL_MODEL_URL || "http://localhost:11434/v1", // Default to Ollama URL
+				apiKey: process.env.LOCAL_MODEL_API_KEY || "ollama", // Some local servers need a dummy key
+			});
+
+			const localModelName = process.env.LOCAL_MODEL_NAME || "llama3.2:latest";
+			console.log("[CHAT-API] Local model name:", localModelName);
+
+			model = localProvider(localModelName);
+		} else {
+			// Use OpenRouter with free models
+			const openrouter = createOpenAI({
+				baseURL: "https://openrouter.ai/api/v1",
+				apiKey: process.env.OPENROUTER_API_KEY,
+			});
+
+			// Only use free models that support tool/function calling
+			const models = [
+				"google/gemini-2.0-flash-exp:free",
+				"google/gemini-1.5-flash-8b:free",
+				"mistralai/mistral-7b-instruct:free"
+			];
+
+			const selectedModel = models[Math.floor(Math.random() * models.length)];
+			console.log("[CHAT-API] Using OpenRouter model:", selectedModel);
+
+			model = openrouter(selectedModel);
+		}
 
 		const result = streamText({
-			model: openrouter("moonshotai/kimi-k2:free"),
+			model,
 			messages,
 			tools,
-			maxSteps: 5,
+			maxSteps: 1,
 			toolChoice: "auto",
 		});
 

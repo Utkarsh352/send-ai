@@ -19,6 +19,7 @@ import { ConfirmationDialog } from "../ui/ConfirmationDialog";
 import { Address } from "viem";
 import { CrossChainRouteInvocation } from "./CrossChainRouteInvocation";
 import { MultiChainPortfolioInvocation } from "./MultiChainPortfolioInvocation";
+import { SwapRouteVisualization } from "./SwapRouteVisualization";
 
 // shadcn Dialog imports
 import { useAccount, useBalance, useSendTransaction, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
@@ -344,7 +345,21 @@ function ChatMessage({
 					);
 				}
 
-				// Otherwise, display the final card with result details.
+				// Otherwise, display the new swap route visualization
+				try {
+					const result = JSON.parse(toolInvocation.result as string);
+					if (result.showVisualization) {
+						return (
+							<div key={toolCallId} className="mt-2">
+								<SwapRouteVisualization result={result} />
+							</div>
+						);
+					}
+				} catch (error) {
+					console.error("Error parsing swap result:", error);
+				}
+
+				// Fallback to original display
 				return (
 					<div key={toolCallId} className="mt-2">
 						<SendCompleteCard result={toolInvocation.result as string} action="Swap" />

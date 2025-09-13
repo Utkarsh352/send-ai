@@ -41,9 +41,9 @@ const CHAIN_CONFIGS = {
 		chain: mainnet,
 		tokens: {
 			'ETH': { address: '0x0000000000000000000000000000000000000000', decimals: 18, isNative: true },
-			'USDC': { address: '0xA0b86a33E6441E6C8C7ECe9c2A72d3E16C8084C4', decimals: 6, isNative: false },
-			'USDT': { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', decimals: 6, isNative: false },
-			'WBTC': { address: '0x2260FAC5E5542a773Aa44fBcfeDf7C193bc2C599', decimals: 8, isNative: false },
+			'USDC': { address: '0xa0b86a33e6441e6c8c7ece9c2a72d3e16c8084c4', decimals: 6, isNative: false },
+			'USDT': { address: '0xdac17f958d2ee523a2206206994597c13d831ec7', decimals: 6, isNative: false },
+			'WBTC': { address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', decimals: 8, isNative: false },
 		}
 	},
 	polygon: {
@@ -114,8 +114,11 @@ export const getMultiChainBalance = tool({
 		}
 
 		try {
-			// Validate address format
-			const checksumAddress = getAddress(userAddress);
+			// Validate address format - handle different cases
+			if (!userAddress || userAddress.length !== 42 || !userAddress.startsWith('0x')) {
+				throw new Error('Invalid wallet address format');
+			}
+			const checksumAddress = userAddress.toLowerCase() as `0x${string}`;
 
 			const results = await Promise.allSettled(
 				selectedChains.map(async (chainName) => {
@@ -142,17 +145,20 @@ export const getMultiChainBalance = tool({
 										address: checksumAddress,
 									});
 								} else {
-									// Get ERC-20 token balance
+									// Get ERC-20 token balance with proper address validation
+									const tokenAddress = tokenConfig.address.toLowerCase() as `0x${string}`;
 									balance = await client.readContract({
-										address: tokenConfig.address as `0x${string}`,
+										address: tokenAddress,
 										abi: ERC20_ABI,
 										functionName: 'balanceOf',
 										args: [checksumAddress],
 									});
 								}
 
-								// Convert to human readable format
-								const formattedBalance = formatEther(balance);
+								// Convert to human readable format based on token decimals
+								const formattedBalance = tokenConfig.isNative
+									? formatEther(balance)
+									: (Number(balance) / Math.pow(10, decimals)).toString();
 								const numericBalance = parseFloat(formattedBalance);
 
 								// Only include tokens with non-zero balance
