@@ -1,10 +1,9 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultConfig, RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { mainnet } from "wagmi/chains";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { config } from "./config";
@@ -19,16 +18,30 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
     setMounted(true); // ✅ Marquer que le thème est chargé
   }, []);
 
-  // If the theme is not yet mounted, do not display RainbowKit (avoids SSR error)
-  if (!mounted) return null;
-
+  // Always provide WagmiProvider context, but conditionally render RainbowKit
   const rainbowTheme = theme === "dark" ? darkTheme() : lightTheme();
 
-  return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={rainbowTheme}>{children}</RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  );
+  try {
+    return (
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          {mounted && typeof window !== 'undefined' ? (
+            <RainbowKitProvider theme={rainbowTheme}>{children}</RainbowKitProvider>
+          ) : (
+            children
+          )}
+        </QueryClientProvider>
+      </WagmiProvider>
+    );
+  } catch (error) {
+    console.error("Error initializing Web3 providers:", error);
+    // Fallback: still provide WagmiProvider context
+    return (
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </WagmiProvider>
+    );
+  }
 }

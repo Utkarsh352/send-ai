@@ -12,10 +12,14 @@ import Image from "next/image";
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isScrolled, setIsScrolled] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
 	const isDesktop = useMediaQuery("(min-width: 768px)");
-	const { address, isConnected } = useAccount(); // Wagmi pour voir si le wallet est connecté
+
+	// Use wagmi hooks directly - they should be available after mounting
+	const { address, isConnected } = useAccount();
 
 	useEffect(() => {
+		setIsMounted(true);
 		const handleScroll = () => setIsScrolled(window.scrollY > 50);
 		window.addEventListener("scroll", handleScroll);
 		return () => window.removeEventListener("scroll", handleScroll);
@@ -68,12 +72,14 @@ const Header = () => {
 					<NavLinkMobile activeLink={activeLink} isMenuOpen={isMenuOpen} onClose={onClose} />
 
 					{/* Try Button, connect wallet if not connected */}
-					{isConnected && (
-						<div className="flex items-center gap-2 py text-xs text-green-300"> 
+					{isMounted && isConnected && (
+						<div className="flex items-center gap-2 py text-xs text-green-300">
 							Connected
 						</div>
 					)}
-					<ConnectButton label="Connect" accountStatus="avatar" showBalance={false} />
+					{isMounted && (
+						<ConnectButton label="Connect" accountStatus="avatar" showBalance={false} />
+					)}
 				</div>
 			</div>
 		</header>

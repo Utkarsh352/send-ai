@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { Web3Provider } from "@/providers/web3-provider";
+import { ClientOnlyWeb3Provider } from "@/providers/client-only-web3";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,10 +33,10 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className={`antialiased tracking-tight ${inter.className}`}>
 				<ThemeProvider attribute="class" defaultTheme="dark">
-					<Web3Provider>
+					<ClientOnlyWeb3Provider>
 						{children}
 						<Toaster />
-					</Web3Provider>
+					</ClientOnlyWeb3Provider>
 				</ThemeProvider>
 			</body>
 		</html>

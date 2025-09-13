@@ -1,8 +1,11 @@
+import HeaderWrapper from '@/components/landing/HeaderWrapper';
 import React from 'react';
 
 const Page = () => {
   return (
-    <div className="container p-6 max-w-3xl mx-auto h-screen">
+    <div>
+      <HeaderWrapper />
+      <div className="container p-6 max-w-3xl mx-auto h-screen">
       <h1 className="text-3xl font-bold mb-4">Documentation</h1>
       <h2 className="text-2xl font-semibold text-muted-foreground mb-4">Send-AI: Cross-Chain Route Optimization on Yellow Network</h2>
 
@@ -30,6 +33,7 @@ const Page = () => {
           <li><strong>Yellow Network Mainnet:</strong> Coming Q2 2025</li>
         </ul>
       </section>
+      </div>
     </div>
   );
 };
