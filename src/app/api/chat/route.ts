@@ -109,8 +109,8 @@ export async function POST(req: Request) {
 
 			// Only use free models that support tool/function calling
 			const models = [
-				"google/gemini-2.0-flash-exp:free",
-				"google/gemini-1.5-flash-8b:free",
+				// "google/gemini-2.0-flash-exp:free",
+				// "google/gemini-1.5-flash-8b:free",
 				"mistralai/mistral-7b-instruct:free"
 			];
 

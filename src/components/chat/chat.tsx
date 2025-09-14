@@ -5,8 +5,10 @@ import { Attachment, ChatRequestOptions, generateId } from "ai";
 import { Message, useChat } from "ai/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "sonner";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import { Button } from "../ui/button";
 import ChatBottombar from "./chat-bottombar";
 import ChatList from "./chat-list";
 import ChatTopbar from "./chat-topbar";
@@ -60,6 +62,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 	});
 	const { address } = useAccount();
 	const [loadingSubmit, setLoadingSubmit] = React.useState(false);
+	const [buttonsVisible, setButtonsVisible] = useState(true);
 	const saveMessages = useChatStore((state) => state.saveMessages);
 	const getMessagesById = useChatStore((state) => state.getMessagesById);
 	const isLocal = useChatStore((state) => state.isLocal);
@@ -165,10 +168,29 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 						isMiddle={true}
 					/>
 
-					<QuickActionsForm
-						onSubmitPrompt={onSubmitPrompt}
-						isLoading={isLoading || loadingSubmit}
-					/>
+					<div className="relative">
+						{/* Toggle Button */}
+						<div className="flex justify-center mb-2">
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => setButtonsVisible(!buttonsVisible)}
+								className="rounded-full bg-background/80 backdrop-blur-sm border-border hover:bg-accent"
+							>
+								{buttonsVisible ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+							</Button>
+						</div>
+
+						{/* Collapsible Quick Actions */}
+						<div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+							buttonsVisible ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+						}`}>
+							<QuickActionsForm
+								onSubmitPrompt={onSubmitPrompt}
+								isLoading={isLoading || loadingSubmit}
+							/>
+						</div>
+					</div>
 
 				
 
