@@ -19,106 +19,156 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-// Custom node component for blockchain networks
+// Enhanced custom node component for blockchain networks
 const NetworkNode: React.FC<NodeProps> = ({ data }) => {
 	return (
 		<div className="relative">
-			{/* Multiple connection handles for mesh network */}
+			{/* Connection handles - hidden but functional */}
 			<Handle
 				type="target"
 				position={Position.Top}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="top"
 			/>
 			<Handle
 				type="target"
 				position={Position.Left}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="left"
 			/>
 			<Handle
 				type="target"
 				position={Position.Right}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="right"
 			/>
 			<Handle
 				type="target"
 				position={Position.Bottom}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="bottom"
 			/>
 
-			<motion.div
-				initial={{ scale: 0 }}
-				animate={{ scale: 1 }}
-				transition={{ duration: 0.5 }}
-				className={`
-					px-4 py-3 rounded-xl shadow-lg border-2 cursor-pointer
-					transition-all duration-300 hover:shadow-xl hover:scale-105
-					${data.isHub ? 'border-yellow-400 bg-card' : 'border-border bg-card'}
+			<div className="relative group">
+				{/* Glowing background effect */}
+				<div className={`
+					absolute -inset-2 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300
+					${data.isHub
+						? 'bg-gradient-to-r from-yellow-400 to-amber-500'
+						: `bg-gradient-to-r ${data.gradient}`
+					}
+				`} />
+
+				{/* Main node container */}
+				<div className={`
+					relative px-6 py-4 rounded-2xl shadow-xl border-2 cursor-pointer backdrop-blur-sm
+					transition-all duration-300 hover:shadow-2xl hover:scale-110 hover:-translate-y-2
+					${data.isHub
+						? 'border-yellow-400/60 bg-gradient-to-br from-yellow-500/20 to-amber-600/20 bg-card/80'
+						: 'border-white/20 bg-card/90'
+					}
 				`}
-				style={{ minWidth: '120px' }}
-			>
-				<div className="flex flex-col items-center gap-2">
-					<div className={`
-						w-12 h-12 rounded-full flex items-center justify-center
-						${data.color} shadow-md
-					`}>
-						<span className="text-white font-bold text-lg">
-							{data.symbol.slice(0, 2)}
-						</span>
-					</div>
-					<div className="text-center">
-						<div className="font-semibold text-sm text-foreground">
-							{data.label}
+				style={{ minWidth: '140px' }}
+				>
+					{/* Network icon container */}
+					<div className="flex flex-col items-center gap-3">
+						<div className={`
+							relative w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg
+							bg-gradient-to-br ${data.gradient}
+							group-hover:shadow-xl transition-shadow duration-300
+						`}>
+							{/* Network logo placeholder */}
+							<span className="text-white font-bold text-xl tracking-tight">
+								{data.symbol.slice(0, 2)}
+							</span>
+
+							{/* Pulse effect for hub */}
+							{data.isHub && (
+								<div className="absolute inset-0 rounded-2xl bg-yellow-400/30 animate-pulse" />
+							)}
 						</div>
-						<div className="text-xs text-muted-foreground">
-							{data.symbol}
+
+						{/* Network details */}
+						<div className="text-center space-y-1">
+							<div className="font-bold text-base text-foreground group-hover:text-yellow-400 transition-colors">
+								{data.label}
+							</div>
+							<div className="text-xs text-muted-foreground font-medium tracking-wide">
+								{data.symbol}
+							</div>
+							{data.amount && (
+								<div className={`text-xs font-bold px-2 py-1 rounded-full ${
+									data.isSource ? 'bg-blue-500/20 text-blue-400' :
+									data.isDestination ? 'bg-purple-500/20 text-purple-400' :
+									'bg-green-500/20 text-green-400'
+								}`}>
+									{data.amount}
+								</div>
+							)}
+							{data.routeInfo && (
+								<div className="text-xs text-yellow-400 font-semibold">
+									{data.routeInfo}
+								</div>
+							)}
+						</div>
+
+						{/* Route status indicator */}
+						<div className="flex items-center gap-2">
+							{data.isSource && (
+								<>
+									<div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+									<span className="text-xs text-blue-400 font-medium">Source</span>
+								</>
+							)}
+							{data.isDestination && (
+								<>
+									<div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+									<span className="text-xs text-purple-400 font-medium">Destination</span>
+								</>
+							)}
+							{data.isHub && !data.isSource && !data.isDestination && (
+								<>
+									<div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+									<span className="text-xs text-yellow-400 font-medium">Router</span>
+								</>
+							)}
 						</div>
 					</div>
+
+					{/* Hub indicator */}
 					{data.isHub && (
-						<div className="absolute -top-2 -right-2">
-							<motion.div
-								className="w-4 h-4 bg-yellow-400 rounded-full"
-								animate={{
-									scale: [1, 1.2, 1],
-									opacity: [1, 0.8, 1]
-								}}
-								transition={{
-									duration: 2,
-									repeat: Infinity,
-									ease: "easeInOut"
-								}}
-							/>
+						<div className="absolute -top-3 -right-3">
+							<div className="w-6 h-6 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg animate-spin">
+								<div className="w-2 h-2 bg-white rounded-full" />
+							</div>
 						</div>
 					)}
 				</div>
-			</motion.div>
+			</div>
 
-			{/* Source handles */}
+			{/* Source handles - hidden but functional */}
 			<Handle
 				type="source"
 				position={Position.Top}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="top-out"
 			/>
 			<Handle
 				type="source"
 				position={Position.Left}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="left-out"
 			/>
 			<Handle
 				type="source"
 				position={Position.Right}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="right-out"
 			/>
 			<Handle
 				type="source"
 				position={Position.Bottom}
-				style={{ background: "#555", border: "none" }}
+				style={{ background: "transparent", border: "none", width: 1, height: 1 }}
 				id="bottom-out"
 			/>
 		</div>
@@ -130,88 +180,107 @@ const nodeTypes = {
 };
 
 export function CrossChainVisualization() {
-	// Simplified nodes focusing on key networks
+	// Route visualization nodes - showing a specific transaction route
 	const initialNodes: Node[] = [
 		{
 			id: "ethereum",
 			type: "networkNode",
-			position: { x: 200, y: 100 },
+			position: { x: 100, y: 100 },
 			data: {
 				label: "Ethereum",
 				symbol: "ETH",
-				color: "bg-blue-500"
-			}
-		},
-		{
-			id: "bnb",
-			type: "networkNode",
-			position: { x: 600, y: 100 },
-			data: {
-				label: "BNB Chain",
-				symbol: "BNB",
-				color: "bg-yellow-600"
-			}
-		},
-		{
-			id: "polygon",
-			type: "networkNode",
-			position: { x: 400, y: 100 },
-			data: {
-				label: "Polygon",
-				symbol: "MATIC",
-				color: "bg-purple-500"
+				gradient: "from-blue-400 to-blue-600",
+				amount: "1,000 USDC",
+				isSource: true
 			}
 		},
 		{
 			id: "yellow",
 			type: "networkNode",
-			position: { x: 400, y: 300 },
+			position: { x: 350, y: 100 },
 			data: {
 				label: "Yellow Network",
 				symbol: "YELLOW",
-				color: "bg-yellow-500",
-				isHub: true
+				gradient: "from-yellow-400 to-amber-500",
+				isHub: true,
+				routeInfo: "Routing Hub"
+			}
+		},
+		{
+			id: "polygon",
+			type: "networkNode",
+			position: { x: 600, y: 100 },
+			data: {
+				label: "Polygon",
+				symbol: "MATIC",
+				gradient: "from-purple-400 to-purple-600",
+				amount: "998 USDC",
+				isDestination: true
 			}
 		}
 	];
 
-	// Simplified edges showing key paths to Yellow Network
+	// Route edges showing the transaction path
 	const initialEdges: Edge[] = [
-		// Direct connections to Yellow Network (fastest & cheapest)
+		// Step 1: From Ethereum to Yellow Network
 		{
-			id: "e-yellow-ethereum",
-			source: "yellow",
-			target: "ethereum",
+			id: "route-step-1",
+			source: "ethereum",
+			target: "yellow",
 			animated: true,
-			style: { stroke: "#10b981", strokeWidth: 3 },
+			style: {
+				stroke: "url(#gradient-route)",
+				strokeWidth: 6,
+				strokeDasharray: "10,5"
+			},
 			markerEnd: {
 				type: MarkerType.ArrowClosed,
-				color: "#10b981"
+				color: "#10b981",
+				width: 25,
+				height: 25
 			},
-			label: "Fastest Route"
-		},
-		{
-			id: "e-yellow-bnb",
-			source: "yellow",
-			target: "bnb",
-			animated: true,
-			style: { stroke: "#f59e0b", strokeWidth: 3 },
-			markerEnd: {
-				type: MarkerType.ArrowClosed,
-				color: "#f59e0b"
+			label: "Step 1: Bridge to Yellow",
+			labelStyle: {
+				fill: "#10b981",
+				fontWeight: 700,
+				fontSize: 14,
+				background: "rgba(0,0,0,0.9)",
+				padding: "4px 8px",
+				borderRadius: "6px",
+				border: "1px solid #10b981"
 			},
-			label: "Cheapest Route"
+			labelBgBorderRadius: 6,
+			labelBgPadding: [8, 4]
 		},
+		// Step 2: From Yellow Network to Polygon
 		{
-			id: "e-yellow-polygon",
+			id: "route-step-2",
 			source: "yellow",
 			target: "polygon",
 			animated: true,
-			style: { stroke: "#facc15", strokeWidth: 2 },
+			style: {
+				stroke: "url(#gradient-route)",
+				strokeWidth: 6,
+				strokeDasharray: "10,5"
+			},
 			markerEnd: {
 				type: MarkerType.ArrowClosed,
-				color: "#facc15"
-			}
+				color: "#10b981",
+				width: 25,
+				height: 25
+			},
+			label: "Step 2: Deliver to Polygon",
+			labelStyle: {
+				fill: "#10b981",
+				fontWeight: 700,
+				fontSize: 14,
+				background: "rgba(0,0,0,0.9)",
+				padding: "4px 8px",
+				borderRadius: "6px",
+				border: "1px solid #10b981"
+			},
+			labelBgBorderRadius: 6,
+			labelBgPadding: [8, 4]
 		}
 	];
 
@@ -228,7 +297,7 @@ export function CrossChainVisualization() {
 						transition={{ duration: 0.8 }}
 						className="text-4xl font-bold text-foreground mb-4"
 					>
-						Cross-Chain Network Topology
+						Cross-Chain Route Visualization
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0, y: 30 }}
@@ -236,43 +305,119 @@ export function CrossChainVisualization() {
 						transition={{ duration: 0.8, delay: 0.2 }}
 						className="text-lg text-muted-foreground max-w-2xl mx-auto"
 					>
-						Yellow Network connects multiple blockchains through state channels, enabling instant cross-chain transactions
+						Watch how your assets move from Ethereum to Polygon through Yellow Network's optimized routing
 					</motion.p>
 				</div>
 
-				{/* React Flow Graph */}
+				{/* Enhanced React Flow Graph */}
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					whileInView={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.8 }}
-					className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
-					style={{ height: "500px" }}
+					className="relative group"
 				>
-					<ReactFlow
-						nodes={nodes}
-						edges={edges}
-						onNodesChange={onNodesChange}
-						onEdgesChange={onEdgesChange}
-						nodeTypes={nodeTypes}
-						fitView
-						proOptions={{ hideAttribution: true }}
-						defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+					{/* Glowing border effect */}
+					<div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/30 via-blue-500/30 to-purple-500/30 rounded-3xl blur opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+
+					{/* Main container */}
+					<div className="relative bg-gradient-to-br from-slate-900/90 to-slate-800/90 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-sm"
+						style={{ height: "600px" }}
 					>
-						<Background color="#374151" gap={20} />
-						<Controls />
-						<MiniMap
-							nodeColor={(node) => {
-								if (node.data?.isHub) return "#facc15";
-								return "#94a3b8";
-							}}
-							pannable
-							zoomable
-							style={{
-								backgroundColor: '#1f2937',
-								border: '1px solid #374151'
-							}}
-						/>
-					</ReactFlow>
+						{/* Header with route indicator */}
+						<div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-slate-900/80 to-transparent p-4">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+									<span className="text-green-400 text-sm font-semibold">Live Route Simulation</span>
+								</div>
+								<div className="flex items-center gap-4 text-xs">
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 bg-blue-400 rounded-full" />
+										<span className="text-blue-400">Source Chain</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 bg-yellow-400 rounded-full" />
+										<span className="text-yellow-400">Router</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<div className="w-2 h-2 bg-purple-400 rounded-full" />
+										<span className="text-purple-400">Destination</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<ReactFlow
+							nodes={nodes}
+							edges={edges}
+							onNodesChange={onNodesChange}
+							onEdgesChange={onEdgesChange}
+							nodeTypes={nodeTypes}
+							fitView
+							proOptions={{ hideAttribution: true }}
+							defaultViewport={{ x: 0, y: 0, zoom: 0.9 }}
+							style={{ background: 'transparent' }}
+						>
+							{/* SVG Gradients for route edges */}
+							<defs>
+								<linearGradient id="gradient-route" x1="0%" y1="0%" x2="100%" y2="0%">
+									<stop offset="0%" stopColor="#10b981" stopOpacity="1" />
+									<stop offset="50%" stopColor="#34d399" stopOpacity="0.9" />
+									<stop offset="100%" stopColor="#10b981" stopOpacity="1" />
+								</linearGradient>
+							</defs>
+
+							<Background
+								color="#475569"
+								gap={25}
+								size={1}
+								style={{ opacity: 0.4 }}
+							/>
+							<Controls
+								style={{
+									background: 'rgba(15,23,42,0.9)',
+									border: '1px solid #475569',
+									borderRadius: '12px',
+									color: '#e2e8f0'
+								}}
+							/>
+							<MiniMap
+								nodeColor={(node) => {
+									if (node.data?.isHub) return "#fbbf24";
+									return "#64748b";
+								}}
+								pannable
+								zoomable
+								style={{
+									backgroundColor: 'rgba(15,23,42,0.9)',
+									border: '1px solid #475569',
+									borderRadius: '8px'
+								}}
+							/>
+						</ReactFlow>
+
+						{/* Bottom route stats */}
+						<div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-slate-900/80 to-transparent p-4">
+							<div className="flex items-center justify-center gap-8 text-sm">
+								<div className="text-center">
+									<div className="text-2xl font-bold text-green-400">2</div>
+									<div className="text-slate-400 text-xs">Route Steps</div>
+								</div>
+								<div className="text-center">
+									<div className="text-2xl font-bold text-blue-400">~4s</div>
+									<div className="text-slate-400 text-xs">Est. Time</div>
+								</div>
+								<div className="text-center">
+									<div className="text-2xl font-bold text-yellow-400">$2.00</div>
+									<div className="text-slate-400 text-xs">Total Fee</div>
+								</div>
+								<div className="text-center">
+									<div className="text-2xl font-bold text-purple-400">998</div>
+									<div className="text-slate-400 text-xs">USDC Out</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</motion.div>
 
 				{/* Features Grid */}
