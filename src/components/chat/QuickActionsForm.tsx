@@ -7,14 +7,15 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { ArrowRightLeft, Send, DollarSign, BarChart3, Zap, Search, Wallet, TrendingUp } from "lucide-react";
+import { ArrowRightLeft, Send, DollarSign, BarChart3, Zap, Search, Wallet, TrendingUp, ShoppingCart, ArrowLeftRight, ArrowDownToLine, Network } from "lucide-react";
 
 interface QuickActionsFormProps {
 	onSubmitPrompt: (prompt: string) => void;
 	isLoading: boolean;
+	onClearMessages?: () => void;
 }
 
-export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickActionsFormProps) {
+export default function QuickActionsForm({ onSubmitPrompt, isLoading, onClearMessages }: QuickActionsFormProps) {
 	const [activeForm, setActiveForm] = useState<string | null>(null);
 	const [formData, setFormData] = useState({
 		fromChain: "",
@@ -25,6 +26,17 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 		swapFromToken: "",
 		swapToToken: "",
 		swapAmount: "",
+		balanceNetwork: "",
+		balanceToken: "",
+		buyToken: "",
+		buyAmount: "",
+		bridgeFromNetwork: "",
+		bridgeToNetwork: "",
+		bridgeToken: "",
+		bridgeAmount: "",
+		depositToken: "",
+		depositAmount: "",
+		depositPlatform: "",
 	});
 
 	const chains = ["Ethereum", "Polygon", "BNB Chain", "Arbitrum", "Optimism", "Avalanche", "Yellow Network"];
@@ -32,50 +44,67 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 
 	const quickActions = [
 		{
-			id: "cross-chain",
-			title: "Cross-Chain Transfer",
-			icon: ArrowRightLeft,
-			description: "Send tokens between different blockchains",
+			id: "buy",
+			title: "Buy",
+			icon: ShoppingCart,
+			description: "Buy tokens with fiat currency",
 			color: "bg-blue-500",
 		},
 		{
 			id: "send",
-			title: "Send Tokens",
+			title: "Send",
 			icon: Send,
-			description: "Send tokens to another wallet address",
+			description: "Send tokens to another wallet",
 			color: "bg-green-500",
 		},
 		{
 			id: "swap",
-			title: "Token Swap",
+			title: "Swap",
 			icon: Zap,
 			description: "Swap one token for another",
 			color: "bg-purple-500",
 		},
 		{
+			id: "bridge",
+			title: "Bridge",
+			icon: ArrowLeftRight,
+			description: "Bridge tokens across networks",
+			color: "bg-red-500",
+		},
+		{
+			id: "deposit",
+			title: "Deposit",
+			icon: ArrowDownToLine,
+			description: "Deposit tokens to earn yield",
+			color: "bg-teal-500",
+		},
+		{
 			id: "balance",
 			title: "Check Balance",
 			icon: Wallet,
-			description: "View your token balances across chains",
+			description: "View token balance on network",
 			color: "bg-yellow-500",
 		},
 		{
 			id: "portfolio",
 			title: "Portfolio Overview",
 			icon: BarChart3,
-			description: "View your multi-chain portfolio",
+			description: "View portfolio with graph",
 			color: "bg-orange-500",
 		},
 		{
-			id: "rates",
-			title: "Exchange Rates",
-			icon: TrendingUp,
-			description: "Check current token exchange rates",
+			id: "cross-chain",
+			title: "Cross-Chain",
+			icon: Network,
+			description: "View cross-chain transaction graph",
 			color: "bg-indigo-500",
 		},
 	];
 
 	const handleQuickAction = (actionId: string) => {
+		if (activeForm !== actionId && onClearMessages) {
+			onClearMessages();
+		}
 		setActiveForm(activeForm === actionId ? null : actionId);
 	};
 
@@ -83,8 +112,8 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 		let prompt = "";
 
 		switch (actionId) {
-			case "cross-chain":
-				prompt = `Find the best route to send ${formData.amount} ${formData.token} from ${formData.fromChain} to ${formData.toChain}${formData.toAddress ? ` to address ${formData.toAddress}` : ""}. Show me the fastest and cheapest options.`;
+			case "buy":
+				prompt = `Buy ${formData.buyAmount} ${formData.buyToken} with fiat currency`;
 				break;
 			case "send":
 				prompt = `Send ${formData.amount} ${formData.token} to ${formData.toAddress}`;
@@ -92,14 +121,20 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 			case "swap":
 				prompt = `Swap ${formData.swapAmount} ${formData.swapFromToken} for ${formData.swapToToken}`;
 				break;
+			case "bridge":
+				prompt = `Bridge ${formData.bridgeAmount} ${formData.bridgeToken} from ${formData.bridgeFromNetwork} to ${formData.bridgeToNetwork}`;
+				break;
+			case "deposit":
+				prompt = `Deposit ${formData.depositAmount} ${formData.depositToken} to ${formData.depositPlatform} to earn yield`;
+				break;
 			case "balance":
-				prompt = "Show my token balances across all chains";
+				prompt = `Show my ${formData.balanceToken} balance on ${formData.balanceNetwork} network`;
 				break;
 			case "portfolio":
-				prompt = "Show my multi-chain portfolio overview with total values";
+				prompt = "Show my multi-chain portfolio overview with interactive DAG (Directed Acyclic Graph) visualization using React Flow. Display each network as a node with portfolio values, connections, and hierarchical layout like a graph node structure.";
 				break;
-			case "rates":
-				prompt = "Show current exchange rates for major tokens";
+			case "cross-chain":
+				prompt = "Show cross-chain transaction DAG visualization with interactive graph nodes using React Flow. Display networks as nodes in a directed acyclic graph with transaction flow arrows and hierarchical node structure.";
 				break;
 		}
 
@@ -114,46 +149,29 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 			swapFromToken: "",
 			swapToToken: "",
 			swapAmount: "",
+			balanceNetwork: "",
+			balanceToken: "",
+			buyToken: "",
+			buyAmount: "",
+			bridgeFromNetwork: "",
+			bridgeToNetwork: "",
+			bridgeToken: "",
+			bridgeAmount: "",
+			depositToken: "",
+			depositAmount: "",
+			depositPlatform: "",
 		});
 	};
 
 	const renderForm = (actionId: string) => {
 		switch (actionId) {
-			case "cross-chain":
+			case "buy":
 				return (
 					<div className="space-y-4">
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="fromChain" className="text-foreground">From Chain</Label>
-								<Select value={formData.fromChain} onValueChange={(value) => setFormData({...formData, fromChain: value})}>
-									<SelectTrigger>
-										<SelectValue placeholder="Select chain" />
-									</SelectTrigger>
-									<SelectContent>
-										{chains.map(chain => (
-											<SelectItem key={chain} value={chain}>{chain}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-							<div>
-								<Label htmlFor="toChain" className="text-foreground">To Chain</Label>
-								<Select value={formData.toChain} onValueChange={(value) => setFormData({...formData, toChain: value})}>
-									<SelectTrigger>
-										<SelectValue placeholder="Select chain" />
-									</SelectTrigger>
-									<SelectContent>
-										{chains.map(chain => (
-											<SelectItem key={chain} value={chain}>{chain}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-						<div className="grid grid-cols-2 gap-4">
-							<div>
-								<Label htmlFor="token" className="text-foreground">Token</Label>
-								<Select value={formData.token} onValueChange={(value) => setFormData({...formData, token: value})}>
+								<Label htmlFor="buyToken" className="text-foreground">Token</Label>
+								<Select value={formData.buyToken} onValueChange={(value) => setFormData({...formData, buyToken: value})}>
 									<SelectTrigger>
 										<SelectValue placeholder="Select token" />
 									</SelectTrigger>
@@ -165,25 +183,167 @@ export default function QuickActionsForm({ onSubmitPrompt, isLoading }: QuickAct
 								</Select>
 							</div>
 							<div>
-								<Label htmlFor="amount" className="text-foreground">Amount</Label>
+								<Label htmlFor="buyAmount" className="text-foreground">Amount (USD)</Label>
 								<Input
-									id="amount"
+									id="buyAmount"
+									type="number"
+									placeholder="100.00"
+									value={formData.buyAmount}
+									onChange={(e) => setFormData({...formData, buyAmount: e.target.value})}
+								/>
+							</div>
+						</div>
+					</div>
+				);
+
+			case "bridge":
+				return (
+					<div className="space-y-4">
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="bridgeFromNetwork" className="text-foreground">From Network</Label>
+								<Select value={formData.bridgeFromNetwork} onValueChange={(value) => setFormData({...formData, bridgeFromNetwork: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select network" />
+									</SelectTrigger>
+									<SelectContent>
+										{chains.map(chain => (
+											<SelectItem key={chain} value={chain}>{chain}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div>
+								<Label htmlFor="bridgeToNetwork" className="text-foreground">To Network</Label>
+								<Select value={formData.bridgeToNetwork} onValueChange={(value) => setFormData({...formData, bridgeToNetwork: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select network" />
+									</SelectTrigger>
+									<SelectContent>
+										{chains.map(chain => (
+											<SelectItem key={chain} value={chain}>{chain}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="bridgeToken" className="text-foreground">Token</Label>
+								<Select value={formData.bridgeToken} onValueChange={(value) => setFormData({...formData, bridgeToken: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select token" />
+									</SelectTrigger>
+									<SelectContent>
+										{tokens.map(token => (
+											<SelectItem key={token} value={token}>{token}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div>
+								<Label htmlFor="bridgeAmount" className="text-foreground">Amount</Label>
+								<Input
+									id="bridgeAmount"
 									type="number"
 									placeholder="0.00"
-									value={formData.amount}
-									onChange={(e) => setFormData({...formData, amount: e.target.value})}
+									value={formData.bridgeAmount}
+									onChange={(e) => setFormData({...formData, bridgeAmount: e.target.value})}
+								/>
+							</div>
+						</div>
+					</div>
+				);
+
+			case "deposit":
+				return (
+					<div className="space-y-4">
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="depositToken" className="text-foreground">Token</Label>
+								<Select value={formData.depositToken} onValueChange={(value) => setFormData({...formData, depositToken: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select token" />
+									</SelectTrigger>
+									<SelectContent>
+										{tokens.map(token => (
+											<SelectItem key={token} value={token}>{token}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div>
+								<Label htmlFor="depositAmount" className="text-foreground">Amount</Label>
+								<Input
+									id="depositAmount"
+									type="number"
+									placeholder="0.00"
+									value={formData.depositAmount}
+									onChange={(e) => setFormData({...formData, depositAmount: e.target.value})}
 								/>
 							</div>
 						</div>
 						<div>
-							<Label htmlFor="toAddress" className="text-foreground">To Address (Optional)</Label>
-							<Input
-								id="toAddress"
-								placeholder="0x..."
-								value={formData.toAddress}
-								onChange={(e) => setFormData({...formData, toAddress: e.target.value})}
-							/>
+							<Label htmlFor="depositPlatform" className="text-foreground">Platform</Label>
+							<Select value={formData.depositPlatform} onValueChange={(value) => setFormData({...formData, depositPlatform: value})}>
+								<SelectTrigger>
+									<SelectValue placeholder="Select platform" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="Aave">Aave</SelectItem>
+									<SelectItem value="Compound">Compound</SelectItem>
+									<SelectItem value="Uniswap">Uniswap</SelectItem>
+									<SelectItem value="Curve">Curve</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
+					</div>
+				);
+
+			case "balance":
+				return (
+					<div className="space-y-4">
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="balanceNetwork" className="text-foreground">Network</Label>
+								<Select value={formData.balanceNetwork} onValueChange={(value) => setFormData({...formData, balanceNetwork: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select network" />
+									</SelectTrigger>
+									<SelectContent>
+										{chains.map(chain => (
+											<SelectItem key={chain} value={chain}>{chain}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<div>
+								<Label htmlFor="balanceToken" className="text-foreground">Token</Label>
+								<Select value={formData.balanceToken} onValueChange={(value) => setFormData({...formData, balanceToken: value})}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select token" />
+									</SelectTrigger>
+									<SelectContent>
+										{tokens.map(token => (
+											<SelectItem key={token} value={token}>{token}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+					</div>
+				);
+
+			case "cross-chain":
+			case "portfolio":
+				return (
+					<div className="space-y-4">
+						<p className="text-muted-foreground text-sm">
+							{actionId === "portfolio"
+								? "Click submit to view your portfolio with graph visualization"
+								: "Click submit to view cross-chain transaction graph with nodes"
+							}
+						</p>
 					</div>
 				);
 

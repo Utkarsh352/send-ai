@@ -20,6 +20,7 @@ import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import { Loader2, Plus } from "lucide-react";
 import { CrossChainVisualization } from "./CrossChainVisualization";
+import UsageApplicationCards from "./UsageApplicationCards";
 
 export default function LandingPage() {
 	const chainId = useChainId();
@@ -115,58 +116,46 @@ export default function LandingPage() {
 				</div>
 			</LampContainer>
 
-			<div className="container items-center max-w-lg text-center flex flex-col w-full mt-24 mb-48">
-				<p className="relative -mb-2 z-20 bg-gradient-to-b text-yellow-500 bg-clip-text py-8 text-4xl font-thin sm:text-7xl">Send-AI</p>
-				<p className="text-lg font-light text-foreground">
-					<span className="text-yellow-500 font-semibold">Maps</span> for <span className="text-yellow-500 font-semibold">Cross</span>-chain transactions powered by <span className="text-yellow-500 font-semibold">A</span>rtificial <span className="text-yellow-500 font-semibold">I</span>ntelligence
-				</p>
+			<div className="container items-center max-w-4xl text-center flex flex-col w-full mt-32 mb-24">
+				<motion.div
+					initial={{ opacity: 0, y: 30 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.5, duration: 0.8 }}
+					className="relative"
+				>
+					<h2 className="relative z-20 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 bg-clip-text text-transparent py-4 text-5xl font-medium sm:text-8xl tracking-tight">
+						Send-AI
+					</h2>
+					<div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 blur-3xl -z-10" />
+				</motion.div>
+
+				<motion.p
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.7, duration: 0.6 }}
+					className="text-xl sm:text-2xl font-light text-muted-foreground max-w-3xl leading-relaxed mt-6"
+				>
+					<span className="text-yellow-400 font-medium">Maps</span> for{" "}
+					<span className="text-yellow-400 font-medium">Cross-chain</span> transactions powered by{" "}
+					<span className="text-yellow-400 font-medium">AI</span>
+				</motion.p>
+
+				<motion.div
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ delay: 0.9, duration: 0.5 }}
+					className="mt-8 flex items-center gap-2 text-sm text-muted-foreground"
+				>
+					<div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+					<span>Revolutionizing cross-chain finance</span>
+					<div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+				</motion.div>
 			</div>
 
 
-			<div className="justify-center mb-36 container w-full px-24 items-center flex flex-col">
-				{/*<div className="w-full h-0.5 bg-accent my-8 z-40"></div>*/}
-				{/* We limit the width here for a cleaner, centered look */}
-				<Accordion type="single" collapsible className="w-full max-w-3xl mx-auto space-y-2">
-					<AccordionItem value="what">
-						<AccordionTrigger className="text-3xl font-medium">
-							What?
-						</AccordionTrigger>
-						<AccordionContent>
-							<p className="text-base text-muted-foreground mt-2">
-								We build intelligent routing systems that find the optimal paths for <strong>cross-chain transactions</strong> through intuitive conversational interfaces powered by <strong>Yellow Network</strong>. Rather than manually searching for bridges and exchanges,
-								our AI agent finds the best routes, lowest fees, and fastest settlement times using plain language commands.
-							</p>
-						</AccordionContent>
-					</AccordionItem>
 
-					<AccordionItem value="how">
-						<AccordionTrigger className="text-3xl font-medium">
-							How?
-						</AccordionTrigger>
-						<AccordionContent>
-							<p className="text-base text-muted-foreground mt-2">
-								Connect your wallet and describe where you want to send assets using natural language.
-								Our AI analyzes multiple routes across Yellow Network&apos;s state channels, traditional bridges, and DEX aggregators
-								to find the optimal path considering speed, cost, and security for your cross-chain transaction.
-							</p>
-						</AccordionContent>
-					</AccordionItem>
-
-					<AccordionItem value="why">
-						<AccordionTrigger className="text-3xl font-medium">
-							Why?
-						</AccordionTrigger>
-						<AccordionContent>
-							<p className="text-base text-muted-foreground mt-2">
-								Cross-chain transactions are fragmented across hundreds of bridges and protocols, each with different risks and costs.
-								We&apos;re committed to making cross-chain finance accessible to <strong>all users</strong>.
-								Like navigation apps find the best driving routes, Send-AI finds the optimal paths for moving assets across blockchains,
-								saving you time, money, and reducing the complexity of multi-chain DeFi.
-							</p>
-						</AccordionContent>
-					</AccordionItem>
-				</Accordion>
-			</div>
+			{/* Usage Application Cards */}
+			<UsageApplicationCards />
 
 			{/* Cross-Chain Visualization */}
 			<CrossChainVisualization />

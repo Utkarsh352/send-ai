@@ -188,6 +188,7 @@ export default function Chat({ initialMessages, id }: ChatProps) {
 							<QuickActionsForm
 								onSubmitPrompt={onSubmitPrompt}
 								isLoading={isLoading || loadingSubmit}
+								onClearMessages={() => setMessages([])}
 							/>
 						</div>
 					</div>
