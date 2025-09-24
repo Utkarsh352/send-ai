@@ -40,15 +40,6 @@ const applications = [
 		status: "Available",
 		gradient: "from-orange-500 to-red-500",
 		href: "/dashboard/compliance"
-	},
-	{
-		id: 4,
-		title: "Yellow Network Integration",
-		description: "Seamless integration with Yellow Network SDK for cross-chain wage redemption and instant settlements.",
-		icon: TrendingUp,
-		status: "Available",
-		gradient: "from-yellow-500 to-amber-500",
-		href: "/dashboard/compensation"
 	}
 ];
 

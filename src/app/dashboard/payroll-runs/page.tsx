@@ -250,11 +250,7 @@ export default function PayrollRunsPage() {
         </Card>
 
         {/* Payroll Runs Table */}
-        <div
-          }
-          }
-        >
-          <Card>
+        <Card>
             <CardHeader>
               <CardTitle>Payroll Runs</CardTitle>
               <CardDescription>

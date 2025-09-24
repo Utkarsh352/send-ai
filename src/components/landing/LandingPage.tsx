@@ -63,7 +63,7 @@ export default function LandingPage() {
 				{/* Action Buttons */}
 
 				{/* Action Buttons */}
-				<div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+				<div className="mt-8 flex justify-center items-center">
 					<Button
 						onClick={() => {
 							setIsLoading(true);
@@ -76,9 +76,6 @@ export default function LandingPage() {
 						Get Started
 						{isLoading && <Loader2 className="animate-spin ml-2 w-4 h-4"/>}
 					</Button>
-					<div className="rounded-full overflow-hidden">
-						<ConnectButton chainStatus="icon" showBalance={false} label="Connect Wallet" />
-					</div>
 				</div>
 
 				{/* Example Interface Preview */}
