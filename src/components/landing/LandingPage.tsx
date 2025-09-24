@@ -76,22 +76,9 @@ export default function LandingPage() {
 						Get Started
 						{isLoading && <Loader2 className="animate-spin ml-2 w-4 h-4"/>}
 					</Button>
-					{isConnected ? (
-						<Button
-							onClick={() => {
-								router.push("/home");
-							}}
-							variant="outline"
-							size="lg"
-							className="rounded-full px-8 py-4 border-yellow-300 text-yellow-600 hover:bg-yellow-50 dark:border-yellow-600 dark:text-yellow-400 dark:hover:bg-yellow-950"
-						>
-							Dashboard
-						</Button>
-					) : (
-						<div className="rounded-full overflow-hidden">
-							<ConnectButton chainStatus="icon" showBalance={false} label="Connect Wallet" />
-						</div>
-					)}
+					<div className="rounded-full overflow-hidden">
+						<ConnectButton chainStatus="icon" showBalance={false} label="Connect Wallet" />
+					</div>
 				</div>
 
 				{/* Example Interface Preview */}
