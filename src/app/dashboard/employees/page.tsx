@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { TransferButton } from "@/components/dashboard/TransferButton";
 
 interface Employee {
   id: string;
@@ -409,38 +410,48 @@ export default function EmployeesPage() {
                         {employee.totalEarned}
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Edit className="w-4 h-4 mr-2" />
-                              Edit Details
-                            </DropdownMenuItem>
-                            {employee.paymentStatus === "active" ? (
+                        <div className="flex items-center gap-2 justify-end">
+                          <TransferButton
+                            recipientAddress={employee.walletAddress}
+                            recipientName={employee.name}
+                            amount={(employee.hourlyRate * 1).toString()} // 1 hour pay
+                            asset="usdc"
+                            size="sm"
+                            variant="outline"
+                          />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
                               <DropdownMenuItem>
-                                <Pause className="w-4 h-4 mr-2" />
-                                Pause Payments
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit Details
                               </DropdownMenuItem>
-                            ) : (
+                              {employee.paymentStatus === "active" ? (
+                                <DropdownMenuItem>
+                                  <Pause className="w-4 h-4 mr-2" />
+                                  Pause Payments
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Start Payments
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem>
-                                <Play className="w-4 h-4 mr-2" />
-                                Start Payments
+                                <Wallet className="w-4 h-4 mr-2" />
+                                View Wallet
                               </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem>
-                              <Wallet className="w-4 h-4 mr-2" />
-                              View Wallet
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Remove Employee
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuItem className="text-red-600">
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Remove Employee
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

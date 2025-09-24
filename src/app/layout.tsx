@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ClientOnlyWeb3Provider } from "@/providers/client-only-web3";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { NitroliteProvider } from "@/providers/NitroliteProvider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -34,8 +35,10 @@ export default function RootLayout({
 			<body className={`antialiased tracking-tight ${inter.className}`}>
 				<ThemeProvider attribute="class" defaultTheme="dark">
 					<ClientOnlyWeb3Provider>
-						{children}
-						<Toaster />
+						<NitroliteProvider>
+							{children}
+							<Toaster />
+						</NitroliteProvider>
 					</ClientOnlyWeb3Provider>
 				</ThemeProvider>
 			</body>

@@ -13,7 +13,6 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { motion } from "framer-motion";
 import { Bell, Building2, Database, Edit, Key, Plus, Save, Trash2, Users, Zap } from "lucide-react";
 import { useState } from "react";
 
@@ -189,10 +188,7 @@ export default function SettingsPage() {
           <TabsContent value="company">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Company Information */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -264,14 +260,10 @@ export default function SettingsPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Bank Details */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle>Bank Details</CardTitle>
@@ -332,7 +324,7 @@ export default function SettingsPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
           </TabsContent>
 

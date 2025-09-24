@@ -12,6 +12,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { ScheduledPaymentsManager } from "@/components/dashboard/ScheduledPaymentsManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PayrollRun {
   id: string;
@@ -34,6 +36,42 @@ export default function PayrollRunsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<string>("all");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+
+  // Mock employees data for scheduled payments
+  const employees = [
+    {
+      id: "EMP-001",
+      name: "Alice Johnson",
+      walletAddress: "0x742d35Cc7567C9E2b8F8C2F6D9bD1f4DdE7e8F9A",
+      hourlyRate: 75,
+      preferredCurrency: "USDC",
+      paymentStatus: "active"
+    },
+    {
+      id: "EMP-002",
+      name: "Bob Chen",
+      walletAddress: "0x8f4E9C1b2A3D4e5F6789aBcD1e2F3456789aBcDe",
+      hourlyRate: 65,
+      preferredCurrency: "USDC",
+      paymentStatus: "active"
+    },
+    {
+      id: "EMP-003",
+      name: "Carol Davis",
+      walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+      hourlyRate: 80,
+      preferredCurrency: "USDC",
+      paymentStatus: "active"
+    },
+    {
+      id: "EMP-004",
+      name: "David Wilson",
+      walletAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
+      hourlyRate: 70,
+      preferredCurrency: "USDC",
+      paymentStatus: "active"
+    }
+  ];
 
   // Mock data - in real app this would come from Yellow Network smart contract
   const payrollRuns: PayrollRun[] = [
@@ -226,52 +264,60 @@ export default function PayrollRunsPage() {
           </Dialog>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-l-4 border-l-green-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
-              <Calendar className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{payrollRuns.length}</div>
-              <p className="text-xs text-muted-foreground">This month</p>
-            </CardContent>
-          </Card>
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="batch" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="batch">Batch Payroll Runs</TabsTrigger>
+            <TabsTrigger value="scheduled">Hourly Payments</TabsTrigger>
+          </TabsList>
 
-          <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
-              <Activity className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">Smart contracts deployed</p>
-            </CardContent>
-          </Card>
+          <TabsContent value="batch" className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="border-l-4 border-l-green-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
+                  <Calendar className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{payrollRuns.length}</div>
+                  <p className="text-xs text-muted-foreground">This month</p>
+                </CardContent>
+              </Card>
 
-          <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
-              <CheckCircle className="h-4 w-4 text-purple-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono">₿11.491</div>
-              <p className="text-xs text-muted-foreground">Via Yellow Network</p>
-            </CardContent>
-          </Card>
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
+                  <Activity className="h-4 w-4 text-blue-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">3</div>
+                  <p className="text-xs text-muted-foreground">Smart contracts deployed</p>
+                </CardContent>
+              </Card>
 
-          <Card className="border-l-4 border-l-orange-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-              <CheckCircle className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">96.2%</div>
-              <p className="text-xs text-muted-foreground">Payment success rate</p>
-            </CardContent>
-          </Card>
-        </div>
+              <Card className="border-l-4 border-l-purple-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-purple-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold font-mono">₿11.491</div>
+                  <p className="text-xs text-muted-foreground">Via Yellow Network</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-orange-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">96.2%</div>
+                  <p className="text-xs text-muted-foreground">Payment success rate</p>
+                </CardContent>
+              </Card>
+            </div>
 
         {/* Filters and Search */}
         <Card>
@@ -423,6 +469,12 @@ export default function PayrollRunsPage() {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="scheduled" className="space-y-6">
+            <ScheduledPaymentsManager employees={employees} />
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

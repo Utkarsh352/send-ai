@@ -1,15 +1,123 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Bitcoin, Wallet, Clock, AlertTriangle, TrendingUp, Send, UserPlus, FileText, CheckCircle, XCircle, Zap } from "lucide-react";
+import { Users, Bitcoin, Wallet, Clock, AlertTriangle, TrendingUp, Send, UserPlus, FileText, CheckCircle, XCircle, Zap, DollarSign, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useNitroliteContext } from "@/providers/NitroliteProvider";
+
+interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  walletAddress?: string;
+  avatar?: string;
+}
 
 export default function DashboardPage() {
   const [currentDate] = useState(new Date());
+  const [showSendMoney, setShowSendMoney] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [sendAmount, setSendAmount] = useState("");
+  const [sendCurrency, setSendCurrency] = useState("USDC");
+  const [sendNote, setSendNote] = useState("");
+  const [isSending, setIsSending] = useState(false);
+
+  // Connect to Nitrolite for wallet functionality
+  const nitrolite = useNitroliteContext();
+
+  // Mock employee data - in real app this would come from API/database
+  const employees: Employee[] = [
+    {
+      id: "EMP001",
+      name: "John Doe",
+      email: "john.doe@company.com",
+      department: "Engineering",
+      walletAddress: "0x1234567890123456789012345678901234567890"
+    },
+    {
+      id: "EMP002",
+      name: "Jane Smith",
+      email: "jane.smith@company.com",
+      department: "Marketing",
+      walletAddress: "0x2345678901234567890123456789012345678901"
+    },
+    {
+      id: "EMP003",
+      name: "Bob Johnson",
+      email: "bob.johnson@company.com",
+      department: "Sales",
+      walletAddress: "0x3456789012345678901234567890123456789012"
+    },
+    {
+      id: "EMP004",
+      name: "Alice Brown",
+      email: "alice.brown@company.com",
+      department: "HR",
+      walletAddress: "0x4567890123456789012345678901234567890123"
+    }
+  ];
+
+  const handleSendMoney = async () => {
+    if (!nitrolite.privateKey || !nitrolite.isAuthenticated) {
+      alert('Please connect with your private key first');
+      return;
+    }
+
+    if (!selectedEmployee || !sendAmount) {
+      alert('Please select an employee and enter an amount');
+      return;
+    }
+
+    const employee = employees.find(emp => emp.id === selectedEmployee);
+    if (!employee || !employee.walletAddress) {
+      alert('Employee wallet address not found');
+      return;
+    }
+
+    const amount = parseFloat(sendAmount);
+    if (amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    try {
+      setIsSending(true);
+
+      // In a real implementation, this would call your Nitrolite transfer function
+      // For now, we'll simulate the transaction
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      alert(`Successfully sent $${amount} ${sendCurrency} to ${employee.name}!`);
+
+      // Reset form
+      setSelectedEmployee("");
+      setSendAmount("");
+      setSendNote("");
+      setShowSendMoney(false);
+
+      // Refresh balances
+      if (nitrolite.privateKey) {
+        const address = `0x${nitrolite.privateKey.replace('0x', '').slice(0, 40)}` as any;
+        nitrolite.fetchBalances(address);
+      }
+
+    } catch (error) {
+      console.error('Send failed:', error);
+      alert('Failed to send payment. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   // Mock data - in real app this would come from API/database
   const summaryStats = {
@@ -115,10 +223,136 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600">
-              <Send className="w-4 h-4 mr-2" />
-              Send Crypto
-            </Button>
+            <Dialog open={showSendMoney} onOpenChange={setShowSendMoney}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600">
+                  <Send className="w-4 h-4 mr-2" />
+                  Send Money
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Send Money to Employee</DialogTitle>
+                  <DialogDescription>
+                    Send crypto payments directly to your employees via Nitrolite
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {/* Authentication Status */}
+                  <div className="p-4 rounded-lg border bg-gray-50 dark:bg-gray-800">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Authentication Status</p>
+                        <p className="text-xs text-muted-foreground">
+                          {nitrolite.isAuthenticated ? 'Authenticated with Yellow Network' :
+                           nitrolite.isAuthenticating ? 'Authenticating...' :
+                           'Not authenticated'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {nitrolite.isAuthenticated ? (
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        ) : nitrolite.isAuthenticating ? (
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                        ) : (
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        )}
+                      </div>
+                    </div>
+                    {nitrolite.privateKey && (
+                      <p className="text-xs text-muted-foreground mt-1 font-mono">
+                        Key: {nitrolite.privateKey.slice(0, 6)}...{nitrolite.privateKey.slice(-4)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Employee Selection */}
+                  <div>
+                    <Label htmlFor="employee">Select Employee</Label>
+                    <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose an employee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map((employee) => (
+                          <SelectItem key={employee.id} value={employee.id}>
+                            <div className="flex flex-col text-left">
+                              <span>{employee.name}</span>
+                              <span className="text-xs text-muted-foreground">{employee.department} • {employee.email}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Amount and Currency */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <Label htmlFor="amount">Amount</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="0.00"
+                        value={sendAmount}
+                        onChange={(e) => setSendAmount(e.target.value)}
+                        step="0.01"
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select value={sendCurrency} onValueChange={setSendCurrency}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USDC">USDC</SelectItem>
+                          <SelectItem value="USDT">USDT</SelectItem>
+                          <SelectItem value="ETH">ETH</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Note */}
+                  <div>
+                    <Label htmlFor="note">Note (Optional)</Label>
+                    <Textarea
+                      id="note"
+                      placeholder="Payment description..."
+                      value={sendNote}
+                      onChange={(e) => setSendNote(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button variant="outline" onClick={() => setShowSendMoney(false)} disabled={isSending}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSendMoney}
+                      disabled={isSending || !nitrolite.isAuthenticated || !selectedEmployee || !sendAmount}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                    >
+                      {isSending ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Send Payment
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -145,7 +379,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">{summaryStats.currentTransactionStatus}</div>
               <div className="mt-2">
-                <Progress value={summaryStats.transactionProgress} className="h-2 [&>div]:bg-gradient-to-r [&>div]:from-green-500 [&>div]:to-emerald-500" />
+                <Progress value={summaryStats.transactionProgress} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-1">
                   {summaryStats.transactionProgress}% complete
                 </p>
@@ -190,9 +424,13 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button size="lg" className="h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600">
+              <Button
+                size="lg"
+                onClick={() => setShowSendMoney(true)}
+                className="h-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600"
+              >
                 <Send className="w-6 h-6" />
-                <span>Send Crypto</span>
+                <span>Send Money</span>
               </Button>
               <Button variant="outline" size="lg" className="h-20 flex flex-col items-center justify-center gap-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50">
                 <UserPlus className="w-6 h-6 text-blue-500" />
@@ -288,7 +526,7 @@ export default function DashboardPage() {
                     <span>Progress</span>
                     <span>75%</span>
                   </div>
-                  <Progress value={75} className="h-3 [&>div]:bg-gradient-to-r [&>div]:from-orange-500 [&>div]:to-yellow-500" />
+                  <Progress value={75} className="h-3" />
                 </div>
               </div>
             </CardContent>

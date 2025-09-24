@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useNitroliteContext } from "@/providers/NitroliteProvider";
 
 
 interface Payslip {
@@ -38,15 +39,6 @@ interface LeaveRequest {
   appliedDate: string;
 }
 
-interface ReimbursementClaim {
-  id: string;
-  type: string;
-  amount: number;
-  description: string;
-  status: "Approved" | "Pending" | "Rejected";
-  submittedDate: string;
-  receipts: string[];
-}
 
 interface Transaction {
   id: string;
@@ -60,8 +52,46 @@ interface Transaction {
 
 export default function EmployeePortalPage() {
   const [showLeaveRequest, setShowLeaveRequest] = useState(false);
-  const [showReimbursementClaim, setShowReimbursementClaim] = useState(false);
-  const [showTaxDeclaration, setShowTaxDeclaration] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+
+  // Connect to Nitrolite for balance and claiming functionality
+  const nitrolite = useNitroliteContext();
+
+  // Calculate claimable amount from balance
+  const claimableAmount = nitrolite.balances?.['usdc'] || nitrolite.balances?.['USDC'] || '0';
+  const claimableFloat = parseFloat(claimableAmount);
+
+  const handleClaim = async () => {
+    if (!nitrolite.account || !nitrolite.isAuthenticated) {
+      alert('Please connect your wallet and authenticate first');
+      return;
+    }
+
+    if (claimableFloat <= 0) {
+      alert('No funds available to claim');
+      return;
+    }
+
+    try {
+      setIsClaiming(true);
+      // In a real implementation, this would transfer from employer to employee
+      // For demo purposes, we'll show a success message
+
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate transaction time
+
+      alert(`Successfully claimed $${claimableFloat.toFixed(2)} USDC!`);
+
+      // Refresh balances
+      if (nitrolite.account) {
+        nitrolite.fetchBalances(nitrolite.account);
+      }
+    } catch (error) {
+      console.error('Claim failed:', error);
+      alert('Failed to claim funds. Please try again.');
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   // Mock employee data - in real app this would come from API based on logged-in user
   const employeeInfo = {
@@ -144,26 +174,6 @@ export default function EmployeePortalPage() {
     }
   ];
 
-  const reimbursementClaims: ReimbursementClaim[] = [
-    {
-      id: "REIMB001",
-      type: "Travel",
-      amount: 250.00,
-      description: "Client meeting transportation and meals",
-      status: "Approved",
-      submittedDate: "2024-01-15",
-      receipts: ["receipt1.pdf", "receipt2.pdf"]
-    },
-    {
-      id: "REIMB002",
-      type: "Professional Development",
-      amount: 450.00,
-      description: "Online course certification",
-      status: "Pending",
-      submittedDate: "2024-01-22",
-      receipts: ["invoice.pdf"]
-    }
-  ];
 
   const transactions: Transaction[] = [
     {
@@ -292,8 +302,12 @@ export default function EmployeePortalPage() {
               <Wallet className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">$425.50</div>
-              <p className="text-xs text-muted-foreground">Ready to claim</p>
+              <div className="text-2xl font-bold text-green-600">
+                {nitrolite.isLoadingBalances ? 'Loading...' : `$${claimableFloat.toFixed(2)}`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {nitrolite.isAuthenticated ? 'Ready to claim' : 'Connect wallet to view'}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -318,12 +332,12 @@ export default function EmployeePortalPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Claims</CardTitle>
+              <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{reimbursementClaims.filter(claim => claim.status === "Pending").length}</div>
-              <p className="text-xs text-muted-foreground">Reimbursement claims</p>
+              <div className="text-2xl font-bold">{leaveRequests.filter(leave => leave.status === "Pending").length}</div>
+              <p className="text-xs text-muted-foreground">Leave requests</p>
             </CardContent>
           </Card>
         </div>
@@ -335,24 +349,61 @@ export default function EmployeePortalPage() {
               <div>
                 <CardTitle className="text-green-800 dark:text-green-200">Available to Claim</CardTitle>
                 <CardDescription className="text-green-700 dark:text-green-300">
-                  Your hourly earnings are ready for instant withdrawal
+                  {nitrolite.isAuthenticated
+                    ? "Your hourly earnings are ready for instant withdrawal"
+                    : "Connect your wallet to view available earnings"
+                  }
                 </CardDescription>
               </div>
-              <div className="text-3xl font-bold text-green-600">$425.50</div>
+              <div className="text-3xl font-bold text-green-600">
+                {nitrolite.isLoadingBalances ? 'Loading...' :
+                 nitrolite.isAuthenticated ? `$${claimableFloat.toFixed(2)}` :
+                 '$0.00'}
+              </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="text-sm text-green-700 dark:text-green-300">
-                <p>Based on 17.02 hours worked this week</p>
-                <p>Last updated: 2 minutes ago</p>
+                {nitrolite.isAuthenticated ? (
+                  <>
+                    <p>Available balance from your Nitrolite account</p>
+                    <p>Last updated: {nitrolite.balances ? 'Just now' : 'Never'}</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Connect wallet to view earnings</p>
+                    <p>Payments processed via Yellow Network</p>
+                  </>
+                )}
               </div>
               <Button
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 disabled:opacity-50"
+                onClick={handleClaim}
+                disabled={!nitrolite.isAuthenticated || claimableFloat <= 0 || isClaiming || nitrolite.isLoadingBalances}
               >
-                <DollarSign className="w-5 h-5 mr-2" />
-                Claim Now
+                {isClaiming ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                    Claiming...
+                  </>
+                ) : !nitrolite.isAuthenticated ? (
+                  <>
+                    <Wallet className="w-5 h-5 mr-2" />
+                    Connect Wallet
+                  </>
+                ) : claimableFloat <= 0 ? (
+                  <>
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    No Funds
+                  </>
+                ) : (
+                  <>
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    Claim Now
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
@@ -360,12 +411,9 @@ export default function EmployeePortalPage() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="transactions">Transaction History</TabsTrigger>
             <TabsTrigger value="payslips">My Payslips</TabsTrigger>
-            <TabsTrigger value="tax">Tax Declarations</TabsTrigger>
-            <TabsTrigger value="reimbursements">Reimbursements</TabsTrigger>
-            <TabsTrigger value="loans">Loans & Advances</TabsTrigger>
             <TabsTrigger value="leaves">Attendance & Leaves</TabsTrigger>
           </TabsList>
 
@@ -480,244 +528,6 @@ export default function EmployeePortalPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="tax">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Tax Declarations</CardTitle>
-                  <CardDescription>
-                    Submit tax-saving investment declarations and download tax documents
-                  </CardDescription>
-                </div>
-                <Dialog open={showTaxDeclaration} onOpenChange={setShowTaxDeclaration}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Declaration
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Upload Tax Declaration</DialogTitle>
-                      <DialogDescription>
-                        Upload your tax-saving investment declarations
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Financial Year</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select financial year" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2024-25">2024-25</SelectItem>
-                            <SelectItem value="2023-24">2023-24</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label>Declaration Type</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select declaration type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="80c">Section 80C</SelectItem>
-                            <SelectItem value="80d">Section 80D</SelectItem>
-                            <SelectItem value="hra">HRA Declaration</SelectItem>
-                            <SelectItem value="nps">NPS Declaration</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="amount">Amount</Label>
-                        <Input id="amount" type="number" placeholder="Enter amount" />
-                      </div>
-                      <div>
-                        <Label htmlFor="document">Supporting Document</Label>
-                        <Input id="document" type="file" accept=".pdf,.jpg,.png" />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setShowTaxDeclaration(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={() => setShowTaxDeclaration(false)}>
-                          Submit Declaration
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">Form-16 (2024)</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Annual tax certificate for financial year 2023-24
-                        </p>
-                        <Button variant="outline" size="sm">
-                          <Download className="w-4 h-4 mr-2" />
-                          Download Form-16
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">TDS Certificate</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Tax deducted at source certificate
-                        </p>
-                        <Button variant="outline" size="sm">
-                          <Download className="w-4 h-4 mr-2" />
-                          Download TDS Certificate
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="reimbursements">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>Reimbursement Claims</CardTitle>
-                    <CardDescription>
-                      Submit and track your expense reimbursement claims
-                    </CardDescription>
-                  </div>
-                  <Dialog open={showReimbursementClaim} onOpenChange={setShowReimbursementClaim}>
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Submit Claim
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Submit Reimbursement Claim</DialogTitle>
-                        <DialogDescription>
-                          Submit a new expense claim for reimbursement
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label>Expense Type</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select expense type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="travel">Travel & Transportation</SelectItem>
-                              <SelectItem value="meals">Business Meals</SelectItem>
-                              <SelectItem value="training">Professional Development</SelectItem>
-                              <SelectItem value="office">Office Supplies</SelectItem>
-                              <SelectItem value="internet">Internet/Phone Bills</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="claimAmount">Amount</Label>
-                          <Input id="claimAmount" type="number" placeholder="Enter amount" />
-                        </div>
-                        <div>
-                          <Label htmlFor="description">Description</Label>
-                          <Textarea id="description" placeholder="Describe your expense..." rows={3} />
-                        </div>
-                        <div>
-                          <Label htmlFor="receipts">Upload Receipts</Label>
-                          <Input id="receipts" type="file" multiple accept=".pdf,.jpg,.png" />
-                        </div>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" onClick={() => setShowReimbursementClaim(false)}>
-                            Cancel
-                          </Button>
-                          <Button onClick={() => setShowReimbursementClaim(false)}>
-                            Submit Claim
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Description</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Submitted</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {reimbursementClaims.map((claim) => (
-                          <TableRow key={claim.id}>
-                            <TableCell className="font-medium">{claim.type}</TableCell>
-                            <TableCell>{claim.description}</TableCell>
-                            <TableCell>${claim.amount.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <Badge className={getStatusColor(claim.status)}>
-                                {claim.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{new Date(claim.submittedDate).toLocaleDateString()}</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
-                                View Details
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="loans">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Loans & Advances</CardTitle>
-                  <CardDescription>
-                    Request salary advances and track loan repayments
-                  </CardDescription>
-                </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Request Advance
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <CreditCard className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="font-medium text-lg mb-2">No Active Loans or Advances</h3>
-                  <p className="text-muted-foreground mb-4">
-                    You currently have no outstanding loans or advances
-                  </p>
-                  <Button>Request Salary Advance</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="leaves">
             <div className="space-y-6">

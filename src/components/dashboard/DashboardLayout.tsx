@@ -6,21 +6,36 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Bell, Bitcoin, ChevronDown, Wallet, Home, Menu, Search, Settings, Send, TrendingUp, User, Users, History, Activity } from "lucide-react";
+import { Bell, Bitcoin, ChevronDown, Wallet, Home, Menu, Search, Settings, Send, TrendingUp, User, Users, History, Activity, TestTube } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useMemo } from "react";
+import { PrivateKeyConnector } from "./PrivateKeyConnector";
+import { BalanceDisplay } from "./BalanceDisplay";
+import { NitroliteStatus } from "./NitroliteStatus";
+import { useNitroliteContext } from "@/providers/NitroliteProvider";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-const navigationItems = [
+// Navigation items for different user roles
+const employerNavigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home, badge: null },
   { name: "Employees", href: "/dashboard/employees", icon: Users, badge: null },
   { name: "Payroll Runs", href: "/dashboard/payroll-runs", icon: Send, badge: null },
   { name: "Payment History", href: "/dashboard/history", icon: History, badge: null },
   { name: "Yellow Network", href: "/dashboard/yellow-network", icon: Activity, badge: null },
+  { name: "Testing", href: "/dashboard/testing", icon: TestTube, badge: null },
+  { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp, badge: null },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
+];
+
+const employeeNavigationItems = [
+  { name: "Dashboard", href: "/dashboard/employee-portal", icon: Home, badge: null },
+  { name: "Payment History", href: "/dashboard/history", icon: History, badge: null },
+  { name: "Yellow Network", href: "/dashboard/yellow-network", icon: Activity, badge: null },
+  { name: "Testing", href: "/dashboard/testing", icon: TestTube, badge: null },
   { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp, badge: null },
   { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
 ];
@@ -28,6 +43,15 @@ const navigationItems = [
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const nitrolite = useNitroliteContext();
+
+  // Determine if current user is an employee based on the current route
+  const isEmployeePortal = pathname?.includes('/employee-portal') || pathname?.startsWith('/dashboard/employee');
+
+  // Get appropriate navigation items based on user role
+  const navigationItems = useMemo(() => {
+    return isEmployeePortal ? employeeNavigationItems : employerNavigationItems;
+  }, [isEmployeePortal]);
 
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={`flex flex-col h-full bg-background border-r ${mobile ? 'w-full' : 'w-64'}`}>
@@ -82,7 +106,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">John Doe</p>
-            <p className="text-xs text-muted-foreground truncate">Payroll Manager</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {isEmployeePortal ? "Employee" : "Payroll Manager"}
+            </p>
           </div>
         </div>
       </div>
@@ -124,13 +150,34 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="relative w-96 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search employees, payrolls..."
+                placeholder={isEmployeePortal ? "Search transactions, payslips..." : "Search employees, payrolls..."}
                 className="pl-10"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Balance Display */}
+            {nitrolite.isAuthenticated && nitrolite.balances && (
+              <BalanceDisplay
+                balance={nitrolite.balances['usdc'] ?? nitrolite.balances['USDC'] ?? null}
+                symbol="USDC"
+                isLoading={nitrolite.isLoadingBalances}
+                className="hidden lg:block"
+              />
+            )}
+
+            {/* Nitrolite Status */}
+            <NitroliteStatus
+              wsStatus={nitrolite.wsStatus}
+              isAuthenticated={nitrolite.isAuthenticated}
+              isAuthenticating={nitrolite.isAuthenticating}
+              className="hidden md:block"
+            />
+
+            {/* Private Key Connector */}
+            <PrivateKeyConnector />
+
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -173,7 +220,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </Avatar>
                   <div className="hidden sm:block text-left">
                     <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">Payroll Manager</p>
+                    <p className="text-xs text-muted-foreground">
+                      {isEmployeePortal ? "Employee" : "Payroll Manager"}
+                    </p>
                   </div>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
