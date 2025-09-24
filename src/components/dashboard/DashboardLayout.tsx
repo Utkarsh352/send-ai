@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Bell, Briefcase, ChevronDown, DollarSign, Home, Menu, Search, Settings, Shield, TrendingUp, User, Users } from "lucide-react";
+import { Bell, Bitcoin, ChevronDown, Wallet, Home, Menu, Search, Settings, Send, TrendingUp, User, Users, History, Activity } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -17,11 +17,11 @@ interface DashboardLayoutProps {
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home, badge: null },
-  { name: "Payroll Runs", href: "/dashboard/payroll-runs", icon: DollarSign, badge: null },
-  { name: "Employees", href: "/dashboard/employees", icon: Users, badge: null },
-  { name: "Compensation & Benefits", href: "/dashboard/compensation", icon: Briefcase, badge: null },
-  { name: "Compliance & Taxes", href: "/dashboard/compliance", icon: Shield, badge: "3" },
-  { name: "Reports & Analytics", href: "/dashboard/reports", icon: TrendingUp, badge: null },
+  { name: "Send Crypto", href: "/dashboard/send", icon: Send, badge: null },
+  { name: "Recipients", href: "/dashboard/recipients", icon: Users, badge: null },
+  { name: "Transaction History", href: "/dashboard/history", icon: History, badge: null },
+  { name: "Wallets", href: "/dashboard/wallets", icon: Wallet, badge: null },
+  { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp, badge: null },
   { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
 ];
 
@@ -34,12 +34,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Logo */}
       <div className="p-6 border-b">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
-            <DollarSign className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center">
+            <Bitcoin className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg">Send-ai</h1>
-            <p className="text-xs text-muted-foreground">Global Payroll Management</p>
+            <h1 className="font-bold text-lg bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Send-ai</h1>
+            <p className="text-xs text-muted-foreground">Crypto Payment Platform</p>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">John Doe</p>
-            <p className="text-xs text-muted-foreground truncate">HR Manager</p>
+            <p className="text-xs text-muted-foreground truncate">Crypto Manager</p>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="relative w-96 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search employees, payroll runs..."
+                placeholder="Search recipients, transactions..."
                 className="pl-10"
               />
             </div>
@@ -148,16 +148,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 <div className="p-2">
                   <div className="p-3 rounded-lg bg-muted/50 mb-2">
-                    <p className="text-sm font-medium">Payroll Due</p>
-                    <p className="text-xs text-muted-foreground">Monthly payroll for Engineering team is due tomorrow</p>
+                    <p className="text-sm font-medium">Crypto Batch Ready</p>
+                    <p className="text-xs text-muted-foreground">Monthly crypto batch for Engineering team is ready to send</p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50 mb-2">
-                    <p className="text-sm font-medium">Tax Compliance</p>
-                    <p className="text-xs text-muted-foreground">Q4 tax filing deadline approaching</p>
+                    <p className="text-sm font-medium">High Network Fees</p>
+                    <p className="text-xs text-muted-foreground">Bitcoin network fees are currently elevated</p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50">
-                    <p className="text-sm font-medium">New Employee</p>
-                    <p className="text-xs text-muted-foreground">Alice Johnson has been added to the system</p>
+                    <p className="text-sm font-medium">New Recipient</p>
+                    <p className="text-xs text-muted-foreground">Alice Johnson has been added as a recipient</p>
                   </div>
                 </div>
               </DropdownMenuContent>
@@ -173,7 +173,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </Avatar>
                   <div className="hidden sm:block text-left">
                     <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">HR Manager</p>
+                    <p className="text-xs text-muted-foreground">Crypto Manager</p>
                   </div>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
