@@ -79,14 +79,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
         {/* Left Side - Branding and Features */}
         <motion.div
-          initial={{ opacity: 0, transform: "translateX(-50px)" }}
-          animate={{ opacity: 1, transform: "translateX(0px)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="text-white space-y-8"
+          className="hidden lg:block text-white space-y-8 lg:pr-8"
         >
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -116,10 +116,12 @@ export default function LoginPage() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-                  className="flex items-start gap-4 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 opacity-0 animate-fade-in"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
+                  className="flex items-start gap-4 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon className="w-5 h-5 text-white" />
@@ -128,7 +130,7 @@ export default function LoginPage() {
                     <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
                     <p className="text-purple-200 text-sm">{feature.description}</p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -147,12 +149,25 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <motion.div
-          initial={{ opacity: 0, transform: "translateX(50px)" }}
-          animate={{ opacity: 1, transform: "translateX(0px)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Card className="w-full max-w-md mx-auto shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="space-y-4">
+              {/* Mobile Brand Header */}
+              <div className="lg:hidden text-center mb-4">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h1 className="text-xl font-bold text-gray-900">PayrollPro</h1>
+                    <p className="text-sm text-gray-600">Global Payroll Management</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="text-center">
                 <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                 <CardDescription>
@@ -259,7 +274,7 @@ export default function LoginPage() {
                     />
                     <Label htmlFor="remember" className="text-sm">Remember me</Label>
                   </div>
-                  <Button variant="link" className="px-0 text-sm">
+                  <Button variant="link" className="px-0 text-sm hover:underline focus:underline">
                     Forgot password?
                   </Button>
                 </div>
@@ -284,7 +299,7 @@ export default function LoginPage() {
                 <div className="text-center pt-4">
                   <p className="text-sm text-muted-foreground">
                     Need help?{" "}
-                    <Button variant="link" className="px-0 text-sm">
+                    <Button variant="link" className="px-0 text-sm hover:underline focus:underline">
                       Contact Support
                     </Button>
                   </p>
