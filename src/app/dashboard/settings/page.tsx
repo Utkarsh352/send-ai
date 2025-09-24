@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Building2, Users, Shield, Zap, Bell, Palette, Database, Key, Plus, Edit, Trash2, Save } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
+import { Bell, Building2, Database, Edit, Key, Plus, Save, Trash2, Users, Zap } from "lucide-react";
+import { useState } from "react";
 
 interface UserRole {
   id: string;
@@ -50,15 +50,15 @@ export default function SettingsPage() {
 
   // Mock data - in real app this would come from API
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
-    name: "PayrollPro Inc.",
+    name: "Send-ai Inc.",
     address: "123 Business St, Suite 100, New York, NY 10001",
     phone: "+1 (555) 123-4567",
-    email: "contact@payrollpro.com",
-    website: "www.payrollpro.com",
+    email: "contact@Send-ai.com",
+    website: "www.Send-ai.com",
     taxId: "12-3456789",
     logo: "/api/placeholder/100/100",
     bankDetails: {
-      accountName: "PayrollPro Inc.",
+      accountName: "Send-ai Inc.",
       accountNumber: "****1234",
       routingNumber: "021000021",
       bankName: "Chase Bank"

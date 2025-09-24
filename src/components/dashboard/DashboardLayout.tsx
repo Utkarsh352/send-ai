@@ -1,15 +1,15 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { Search, Bell, User, Menu, Home, Users, DollarSign, FileText, TrendingUp, Settings, Briefcase, Shield, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Bell, Briefcase, ChevronDown, DollarSign, Home, Menu, Search, Settings, Shield, TrendingUp, User, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ReactNode, useState } from "react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -38,7 +38,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <DollarSign className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg">PayrollPro</h1>
+            <h1 className="font-bold text-lg">Send-ai</h1>
             <p className="text-xs text-muted-foreground">Global Payroll Management</p>
           </div>
         </div>
@@ -53,11 +53,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           return (
             <Link key={item.name} href={item.href} onClick={() => mobile && setSidebarOpen(false)}>
               <div
-                className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 hover:translate-x-1 ${
-                  isActive
+                className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 hover:translate-x-1 ${isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className="w-5 h-5" />
