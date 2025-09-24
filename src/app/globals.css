@@ -74,6 +74,7 @@
 :root {
   --scrollbar-thumb-color: #ccc;
   --scrollbar-thumb-hover-color: #aaa;
+  --conic-position: from 0deg at center;
 }
 
 ::-webkit-scrollbar {
