@@ -53,7 +53,7 @@ export default function LandingPage() {
 					}}
 					className="bg-gradient-to-t pb-4 z-40 font-bold from-neutral-300 to-white bg-clip-text text-transparent text-4xl tracking-tight md:text-6xl lg:text-7xl text-center leading-[1.1] max-w-5xl mx-auto"
 				>
-					Get Paid Hourly, Redeem Instantly
+					Hourly Pay, Redeems Instantly
 				</motion.h1>
 
 				<p className="font-normal text-lg md:text-xl text-muted-foreground tracking-normal mt-4 mb-12 max-w-2xl mx-auto text-center leading-relaxed">
