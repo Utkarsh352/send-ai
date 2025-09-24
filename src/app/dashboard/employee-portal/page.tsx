@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { motion } from "framer-motion";
+
 
 interface Payslip {
   id: string;
@@ -269,9 +269,9 @@ export default function EmployeePortalPage() {
           </TabsList>
 
           <TabsContent value="payslips">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
+              }
+              }
             >
               <Card>
                 <CardHeader>
@@ -322,7 +322,7 @@ export default function EmployeePortalPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </TabsContent>
 
           <TabsContent value="tax">

@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { motion } from "framer-motion";
+
 
 interface ReportTemplate {
   id: string;
@@ -275,11 +275,7 @@ export default function ReportsPage() {
             </Card>
 
             {/* Report Templates Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredReports.map((report) => {
                 const Icon = report.icon;
                 return (
@@ -333,7 +329,7 @@ export default function ReportsPage() {
                   </Card>
                 );
               })}
-            </motion.div>
+            </div>
           </TabsContent>
 
           <TabsContent value="custom">

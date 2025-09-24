@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -53,9 +52,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           return (
             <Link key={item.name} href={item.href} onClick={() => mobile && setSidebarOpen(false)}>
-              <motion.div
-                whileHover={{ x: 4 }}
-                className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
+              <div
+                className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 hover:translate-x-1 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -70,7 +68,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     {item.badge}
                   </Badge>
                 )}
-              </motion.div>
+              </div>
             </Link>
           );
         })}

@@ -83,8 +83,8 @@ export default function LoginPage() {
 
         {/* Left Side - Branding and Features */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, transform: "translateX(-50px)" }}
+          animate={{ opacity: 1, transform: "translateX(0px)" }}
           transition={{ duration: 0.6 }}
           className="text-white space-y-8"
         >
@@ -116,12 +116,10 @@ export default function LoginPage() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                  className="flex items-start gap-4 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+                  style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                  className="flex items-start gap-4 p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 opacity-0 animate-fade-in"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon className="w-5 h-5 text-white" />
@@ -130,7 +128,7 @@ export default function LoginPage() {
                     <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
                     <p className="text-purple-200 text-sm">{feature.description}</p>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -149,8 +147,8 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, transform: "translateX(50px)" }}
+          animate={{ opacity: 1, transform: "translateX(0px)" }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Card className="w-full max-w-md mx-auto shadow-2xl border-0 bg-white/95 backdrop-blur-sm">

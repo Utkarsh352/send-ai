@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { motion } from "framer-motion";
+
 
 interface ComplianceItem {
   id: string;
@@ -261,9 +261,9 @@ export default function CompliancePage() {
           <TabsContent value="dashboard">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Compliance Items */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+              <div
+                }
+                }
               >
                 <Card>
                   <CardHeader>
@@ -302,13 +302,13 @@ export default function CompliancePage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Upcoming Deadlines */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
+              <div
+                }
+                }
+                }
               >
                 <Card>
                   <CardHeader>
@@ -344,14 +344,14 @@ export default function CompliancePage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="tax-filings">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
+              }
+              }
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -415,7 +415,7 @@ export default function CompliancePage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </TabsContent>
 
           <TabsContent value="reports">

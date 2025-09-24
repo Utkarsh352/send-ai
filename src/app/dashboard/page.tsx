@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const [currentDate] = useState(new Date());
@@ -116,257 +115,209 @@ export default function DashboardPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{summaryStats.totalEmployees}</div>
-                <p className="text-xs text-muted-foreground">
-                  Across 12 countries
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryStats.totalEmployees}</div>
+              <p className="text-xs text-muted-foreground">
+                Across 12 countries
+              </p>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Current Payroll Cycle</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{summaryStats.currentPayrollStatus}</div>
-                <div className="mt-2">
-                  <Progress value={summaryStats.payrollProgress} className="h-2" />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {summaryStats.payrollProgress}% complete
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{summaryStats.pendingApprovals}</div>
-                <p className="text-xs text-muted-foreground">
-                  Requires immediate attention
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Current Payroll Cycle</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryStats.currentPayrollStatus}</div>
+              <div className="mt-2">
+                <Progress value={summaryStats.payrollProgress} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {summaryStats.payrollProgress}% complete
                 </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Next Disbursement</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {new Date(summaryStats.nextDisbursementDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {summaryStats.pendingAmount} pending
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryStats.pendingApprovals}</div>
+              <p className="text-xs text-muted-foreground">
+                Requires immediate attention
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Next Disbursement</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {new Date(summaryStats.nextDisbursementDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {summaryStats.pendingAmount} pending
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Frequently used actions to manage your payroll</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <Play className="w-6 h-6" />
-                  <span>Run Payroll</span>
-                </Button>
-                <Button variant="outline" size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <UserPlus className="w-6 h-6" />
-                  <span>Add Employee</span>
-                </Button>
-                <Button variant="outline" size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <FileText className="w-6 h-6" />
-                  <span>Generate Report</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Frequently used actions to manage your payroll</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
+                <Play className="w-6 h-6" />
+                <span>Run Payroll</span>
+              </Button>
+              <Button variant="outline" size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
+                <UserPlus className="w-6 h-6" />
+                <span>Add Employee</span>
+              </Button>
+              <Button variant="outline" size="lg" className="h-20 flex flex-col items-center justify-center gap-2">
+                <FileText className="w-6 h-6" />
+                <span>Generate Report</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest payroll runs and system updates</CardDescription>
-              </div>
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-4 rounded-lg border">
-                    <div className="flex items-center gap-4">
-                      {getStatusIcon(activity.status)}
-                      <div>
-                        <p className="font-medium">{activity.title}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>{new Date(activity.date).toLocaleDateString()}</span>
-                          {activity.amount && (
-                            <>
-                              <span>•</span>
-                              <span>{activity.amount}</span>
-                            </>
-                          )}
-                          {activity.approver && (
-                            <>
-                              <span>•</span>
-                              <span>Approved by {activity.approver}</span>
-                            </>
-                          )}
-                          {activity.employee && (
-                            <>
-                              <span>•</span>
-                              <span>{activity.employee} ({activity.department})</span>
-                            </>
-                          )}
-                        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Latest payroll runs and system updates</CardDescription>
+            </div>
+            <Button variant="outline" size="sm">
+              View All
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-center justify-between p-4 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    {getStatusIcon(activity.status)}
+                    <div>
+                      <p className="font-medium">{activity.title}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{new Date(activity.date).toLocaleDateString()}</span>
+                        {activity.amount && (
+                          <>
+                            <span>•</span>
+                            <span>{activity.amount}</span>
+                          </>
+                        )}
+                        {activity.approver && (
+                          <>
+                            <span>•</span>
+                            <span>Approved by {activity.approver}</span>
+                          </>
+                        )}
+                        {activity.employee && (
+                          <>
+                            <span>•</span>
+                            <span>{activity.employee} ({activity.department})</span>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <Badge className={getStatusColor(activity.status)}>
-                      {activity.status.replace('_', ' ')}
-                    </Badge>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                  <Badge className={getStatusColor(activity.status)}>
+                    {activity.status.replace('_', ' ')}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Financial Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Budget Overview</CardTitle>
-                <CardDescription>Track your payroll spending for this month</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Total Budget</span>
-                    <span className="font-medium">{summaryStats.monthlyBudget}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Disbursed</span>
-                    <span className="font-medium text-green-600">{summaryStats.disbursedThisMonth}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Remaining</span>
-                    <span className="font-medium">{summaryStats.pendingAmount}</span>
-                  </div>
-                  <Progress value={75} className="h-2" />
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Budget Overview</CardTitle>
+              <CardDescription>Track your payroll spending for this month</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Total Budget</span>
+                  <span className="font-medium">{summaryStats.monthlyBudget}</span>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <div className="flex justify-between text-sm">
+                  <span>Disbursed</span>
+                  <span className="font-medium text-green-600">{summaryStats.disbursedThisMonth}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Remaining</span>
+                  <span className="font-medium">{summaryStats.pendingAmount}</span>
+                </div>
+                <Progress value={75} className="h-2" />
+              </div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>System Status</CardTitle>
-                <CardDescription>Current status of payroll systems</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">Yellow Network</span>
-                  </div>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    Connected
-                  </Badge>
+          <Card>
+            <CardHeader>
+              <CardTitle>System Status</CardTitle>
+              <CardDescription>Current status of payroll systems</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Yellow Network</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">Bank Integration</span>
-                  </div>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    Active
-                  </Badge>
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  Connected
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Bank Integration</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm">Compliance Engine</span>
-                  </div>
-                  <Badge variant="outline" className="text-yellow-600 border-yellow-600">
-                    Processing
-                  </Badge>
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  Active
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <span className="text-sm">Compliance Engine</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">Notification System</span>
-                  </div>
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    Online
-                  </Badge>
+                <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                  Processing
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Notification System</span>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  Online
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </DashboardLayout>

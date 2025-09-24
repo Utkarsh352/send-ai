@@ -1,62 +1,54 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-	Route,
-	Shield,
+	ArrowRight,
 	Building2,
 	Coins,
 	TrendingUp,
-	ArrowRight
+	Users,
+	FileText,
+	Calculator
 } from "lucide-react";
 import Link from "next/link";
 
 const applications = [
 	{
 		id: 1,
-		title: "Cross-chain routing visualization",
-		description: "See paths between chains for sending tokens safely with real-time route analysis and optimization.",
-		icon: Route,
-		status: "Coming Soon",
+		title: "Real-Time Earnings Tracking",
+		description: "Track your hourly earnings as you work, with automatic accumulation powered by Nitrolite Protocol's state channels.",
+		icon: Calculator,
+		status: "Available",
 		gradient: "from-blue-500 to-cyan-500",
-		href: "/features/routing"
-	},
-	{
-		id: 2,
-		title: "Security ratings",
-		description: "Rate chains and bridges to guide users on the safest routes with comprehensive risk assessment.",
-		icon: Shield,
-		status: "Coming Soon",
-		gradient: "from-green-500 to-emerald-500",
-		href: "/features/security"
-	},
-	{
-		id: 3,
-		title: "SaaS payroll and vendor payments",
-		description: "Allow SaaS companies to pay vendors, manage subscriptions, and handle payroll across chains.",
-		icon: Building2,
-		status: "Coming Soon",
-		gradient: "from-purple-500 to-violet-500",
 		href: "/features/payroll"
 	},
 	{
-		id: 4,
-		title: "Airdrops management",
-		description: "Create and distribute airdrops efficiently across multiple chains with automated distribution.",
-		icon: Coins,
-		status: "Coming Soon",
-		gradient: "from-orange-500 to-red-500",
-		href: "/features/airdrops"
+		id: 2,
+		title: "Instant Hourly Redemption",
+		description: "Access your earned wages instantly every hour through Yellow SDK integration with zero wait times.",
+		icon: Users,
+		status: "Available",
+		gradient: "from-purple-500 to-violet-500",
+		href: "/dashboard/employee-portal"
 	},
 	{
-		id: 5,
-		title: "Cross-chain yield advisor",
-		description: "Get AI-powered suggestions for optimal chains and transactions for yield generation.",
+		id: 3,
+		title: "Nitrolite Channel Security",
+		description: "Secure off-chain channels using ERC-7824 state channels for efficient hourly wage access and redemption.",
+		icon: FileText,
+		status: "Available",
+		gradient: "from-orange-500 to-red-500",
+		href: "/dashboard/compliance"
+	},
+	{
+		id: 4,
+		title: "Yellow Network Integration",
+		description: "Seamless integration with Yellow Network SDK for cross-chain wage redemption and instant settlements.",
 		icon: TrendingUp,
-		status: "Coming Soon",
+		status: "Available",
 		gradient: "from-yellow-500 to-amber-500",
-		href: "/features/yield"
+		href: "/dashboard/compensation"
 	}
 ];
 
@@ -66,10 +58,10 @@ export default function UsageApplicationCards() {
 			<div className="container mx-auto max-w-7xl">
 				<div className="text-center mb-16">
 					<h2 className="text-4xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent mb-4">
-						Upcoming Features
+						Features
 					</h2>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Explore the powerful applications we're building to revolutionize cross-chain finance
+						Experience revolutionary hourly work with instant wage access powered by Nitrolite Protocol
 					</p>
 				</div>
 

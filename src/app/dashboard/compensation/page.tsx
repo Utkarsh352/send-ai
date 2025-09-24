@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { motion } from "framer-motion";
+
 
 interface SalaryStructure {
   id: string;
@@ -242,9 +242,9 @@ export default function CompensationPage() {
           </TabsList>
 
           <TabsContent value="structures">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
+              }
+              }
             >
               <Card>
                 <CardHeader>
@@ -302,7 +302,7 @@ export default function CompensationPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </TabsContent>
 
           <TabsContent value="allowances">

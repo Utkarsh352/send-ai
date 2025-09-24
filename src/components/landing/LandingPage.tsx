@@ -19,7 +19,7 @@ import { LampContainer } from "../ui/lamp";
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import { Loader2, Plus } from "lucide-react";
-import { CrossChainVisualization } from "./CrossChainVisualization";
+import { PayrollDashboardPreview } from "./PayrollDashboardPreview";
 import UsageApplicationCards from "./UsageApplicationCards";
 
 export default function LandingPage() {
@@ -41,8 +41,8 @@ export default function LandingPage() {
 	}, [chainId, isConnected, switchChain]);
 
 	return (
-		<div className="container min-h-screen flex flex-col items-center text-foreground">
-			<LampContainer className="px-6 pt-48">
+		<div className="w-full min-h-screen text-foreground">
+			<LampContainer className="px-6 pt-24 pb-16">
 				<motion.h1
 					initial={{ opacity: 0, y: 50 }}
 					animate={hasLoaded ? { opacity: 1, y: 0 } : {}}
@@ -51,39 +51,52 @@ export default function LandingPage() {
 						duration: 0.8,
 						ease: "easeInOut",
 					}}
-					className="bg-gradient-to-t pb-4 z-40 font-bold from-neutral-400 to-neutral-100  bg-clip-text text-transparent text-4xl tracking-tight md:text-7xl text-center leading-[1.2]"
+					className="bg-gradient-to-t pb-4 z-40 font-bold from-neutral-300 to-white bg-clip-text text-transparent text-4xl tracking-tight md:text-6xl lg:text-7xl text-center leading-[1.1] max-w-5xl mx-auto"
 				>
-					Maps for Cross-Chain Transactions
+					Get Paid Hourly, Redeem Instantly
 				</motion.h1>
 
-				<p className="font-normal text-lg text-muted-foreground tracking-normal mt-1 mb-8 max-w-xl mx-auto text-center">
-					Find the best routes for cross-chain transactions. <br /> Powered by Yellow Network & AI-driven path optimization
+				<p className="font-normal text-lg md:text-xl text-muted-foreground tracking-normal mt-4 mb-12 max-w-2xl mx-auto text-center leading-relaxed">
+					Work by the hour, access your earnings every hour. <br /> Powered by Nitrolite Protocol & Yellow Network SDK
 				</p>
 
 				{/* Action Buttons */}
 
-				{/* Connect or Start Button */}
-				<div className="mt-8">
+				{/* Action Buttons */}
+				<div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+					<Button
+						onClick={() => {
+							setIsLoading(true);
+							router.push("/dashboard/login");
+						}}
+						disabled={isLoading}
+						size="lg"
+						className="rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+					>
+						Get Started
+						{isLoading && <Loader2 className="animate-spin ml-2 w-4 h-4"/>}
+					</Button>
 					{isConnected ? (
 						<Button
 							onClick={() => {
-								setIsLoading(true);
 								router.push("/home");
 							}}
-							disabled={isLoading}
-							className="rounded-full"
+							variant="outline"
+							size="lg"
+							className="rounded-full px-8 py-4 border-yellow-300 text-yellow-600 hover:bg-yellow-50 dark:border-yellow-600 dark:text-yellow-400 dark:hover:bg-yellow-950"
 						>
-							Start
-							{isLoading && <Loader2 className="animate-spin ml-2 w-4 h-4"/>}
+							Dashboard
 						</Button>
 					) : (
-						<ConnectButton chainStatus="icon" showBalance={false} label="Connect Wallet" />
+						<div className="rounded-full overflow-hidden">
+							<ConnectButton chainStatus="icon" showBalance={false} label="Connect Wallet" />
+						</div>
 					)}
 				</div>
 
-				{/* Example Chat Prompt */}
-				<div className="mt-12 w-full mx-auto">
-					<div className="flex items-center gap-4 mb-4">
+				{/* Example Interface Preview */}
+				<div className="mt-16 w-full max-w-2xl mx-auto">
+					<div className="flex items-center gap-4 mb-6">
 						<div className="relative">
 							<div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
 								<svg width="18" height="18" viewBox="0 0 16 16" fill="none">
@@ -93,26 +106,30 @@ export default function LandingPage() {
 							</div>
 							<div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white"></div>
 						</div>
-						<p className="text-lg text-muted-foreground">
-							Where would you like to send your assets across chains?
+						<p className="text-lg text-muted-foreground font-medium">
+							Track your hourly earnings and redeem instantly
 						</p>
 					</div>
-					<Textarea
-						autoComplete="off"
-						name="message"
-						className="pointer-events-none shadow-2xl bg-accent resize-none text-orange-500 text-bold text-xl px-4 py-6 placeholder:text-zinc-100 disabled:opacity-50 w-full rounded-md"
-						placeholder="Send 100 USDC from Ethereum to Polygon..."
-					/>
+					<div className="relative">
+						<Textarea
+							autoComplete="off"
+							name="message"
+							className="pointer-events-none shadow-2xl bg-card border border-border/50 resize-none text-yellow-600 dark:text-yellow-400 font-semibold text-xl px-6 py-6 placeholder:text-muted-foreground/70 w-full rounded-xl backdrop-blur-sm"
+							placeholder="Redeem $25.50 earned in the last hour..."
+							rows={3}
+						/>
+						<div className="absolute top-4 right-4 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+					</div>
 				</div>
 
 
 
 				<div className="grid grid-cols-2 pt-12 gap-4 w-full mx-auto">
-					<Button variant="outline" disabled={true}>CROSS-CHAIN SEND</Button>
-					<Button variant="outline" disabled={true}>ROUTE FINDER</Button>
-					<Button variant="outline" disabled={true}>BRIDGE ASSETS</Button>
-					<Button variant="outline" disabled={true}>YIELD FARMING</Button>
-					<Button variant="outline" className="col-span-2" disabled={true}>DEFI PROTOCOL EXPLORER</Button>
+					<Button variant="outline" disabled={true}>HOURLY TRACKING</Button>
+					<Button variant="outline" disabled={true}>INSTANT REDEMPTION</Button>
+					<Button variant="outline" disabled={true}>PAYMENT STREAMING</Button>
+					<Button variant="outline" disabled={true}>NITROLITE CHANNELS</Button>
+					<Button variant="outline" className="col-span-2" disabled={true}>YELLOW SDK INTEGRATION</Button>
 				</div>
 			</LampContainer>
 
@@ -135,9 +152,9 @@ export default function LandingPage() {
 					transition={{ delay: 0.7, duration: 0.6 }}
 					className="text-xl sm:text-2xl font-light text-muted-foreground max-w-3xl leading-relaxed mt-6"
 				>
-					<span className="text-yellow-400 font-medium">Maps</span> for{" "}
-					<span className="text-yellow-400 font-medium">Cross-chain</span> transactions powered by{" "}
-					<span className="text-yellow-400 font-medium">AI</span>
+					Why wait for payday when you're paid{" "}
+					<span className="text-yellow-400 font-medium">hourly?</span> Get your{" "}
+					<span className="text-yellow-400 font-medium">earnings</span> every hour
 				</motion.p>
 
 				<motion.div
@@ -147,7 +164,7 @@ export default function LandingPage() {
 					className="mt-8 flex items-center gap-2 text-sm text-muted-foreground"
 				>
 					<div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-					<span>Revolutionizing cross-chain finance</span>
+					<span>Never run out of money mid-month again</span>
 					<div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
 				</motion.div>
 			</div>
@@ -157,12 +174,12 @@ export default function LandingPage() {
 			{/* Usage Application Cards */}
 			<UsageApplicationCards />
 
-			{/* Cross-Chain Visualization */}
-			<CrossChainVisualization />
+			{/* Payroll Dashboard Preview */}
+			<PayrollDashboardPreview />
 
 			{/* Footer */}
 			<footer className="m-8 text-sm opacity-70 pb-8">
-				Powered by Yellow Network • Cross-Chain Route Optimization & Artificial Intelligence
+				Powered by Nitrolite Protocol & Yellow Network SDK • Instant Access to Hourly Earnings
 			</footer>
 		</div>
 	);

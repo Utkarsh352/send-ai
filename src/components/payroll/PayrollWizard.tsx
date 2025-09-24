@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Employee {
   id: string;
@@ -577,17 +576,9 @@ export function PayrollWizard({ isOpen, onClose, onComplete }: PayrollWizardProp
 
           {/* Step Content */}
           <div className="flex-1 overflow-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderStepContent()}
-              </motion.div>
-            </AnimatePresence>
+            <div key={currentStep} className="transition-all duration-200">
+              {renderStepContent()}
+            </div>
           </div>
         </div>
 
