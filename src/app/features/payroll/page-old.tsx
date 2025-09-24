@@ -11,8 +11,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePayrollManager } from "@/hooks/usePayrollManager";
 import { toast } from "sonner";
-import { EmployeeManagement } from "@/components/payroll/EmployeeManagement";
-import { PaymentStatusModal } from "@/components/payroll/PaymentStatusModal";
 
 const payrollFeatures = [
 	{
@@ -37,6 +35,39 @@ const payrollFeatures = [
 	}
 ];
 
+const exampleEmployees = [
+	{
+		name: "Alice Johnson",
+		role: "Frontend Developer",
+		location: "United States",
+		chain: "Ethereum",
+		token: "USDC",
+		amount: "8,500",
+		frequency: "Monthly",
+		status: "Active"
+	},
+	{
+		name: "Carlos Rodriguez",
+		role: "Backend Engineer",
+		location: "Mexico",
+		chain: "Polygon",
+		token: "USDT",
+		amount: "7,200",
+		frequency: "Bi-weekly",
+		status: "Active"
+	},
+	{
+		name: "Priya Sharma",
+		role: "UI/UX Designer",
+		location: "India",
+		chain: "BNB Chain",
+		token: "BUSD",
+		amount: "4,800",
+		frequency: "Monthly",
+		status: "Active"
+	}
+];
+
 export default function PayrollPage() {
 	const {
 		isConnected,
@@ -44,7 +75,6 @@ export default function PayrollPage() {
 		isConnecting,
 		error,
 		employees,
-		addEmployee,
 		processPayment,
 		processAllPendingPayments,
 		payrollSessions,
@@ -57,8 +87,6 @@ export default function PayrollPage() {
 
 	const [autoPayEnabled, setAutoPayEnabled] = useState(true);
 	const [showAddEmployee, setShowAddEmployee] = useState(false);
-	const [showPaymentStatus, setShowPaymentStatus] = useState(false);
-	const [currentPaymentSession, setCurrentPaymentSession] = useState<any>(null);
 
 	// Auto-connect on mount
 	useEffect(() => {
@@ -72,10 +100,8 @@ export default function PayrollPage() {
 	// Handle payment processing
 	const handlePayNow = async (employeeId: string) => {
 		try {
-			const session = await processPayment(employeeId);
-			setCurrentPaymentSession(session);
-			setShowPaymentStatus(true);
-			toast.success('Payment initiated via Yellow Network!');
+			await processPayment(employeeId);
+			toast.success('Payment processed successfully via Yellow Network!');
 		} catch (err) {
 			toast.error(`Payment failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		}
@@ -88,16 +114,6 @@ export default function PayrollPage() {
 			toast.success('All pending payments processed!');
 		} catch (err) {
 			toast.error(`Batch payment failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-		}
-	};
-
-	// Handle adding employee
-	const handleAddEmployee = async (employeeData: any) => {
-		try {
-			await addEmployee(employeeData);
-			toast.success('Employee added successfully!');
-		} catch (err) {
-			toast.error(`Failed to add employee: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		}
 	};
 
@@ -187,7 +203,7 @@ export default function PayrollPage() {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<p className="text-3xl font-bold">{payrollStats.totalEmployees}</p>
+								<p className="text-3xl font-bold">127</p>
 								<p className="text-sm text-muted-foreground">Across 23 countries</p>
 							</CardContent>
 						</Card>
@@ -199,8 +215,8 @@ export default function PayrollPage() {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<p className="text-3xl font-bold">{payrollStats.monthlyBudget}</p>
-								<p className="text-sm text-muted-foreground">Paid: {payrollStats.paidThisMonth}</p>
+								<p className="text-3xl font-bold">$485K</p>
+								<p className="text-sm text-muted-foreground">+12% from last month</p>
 							</CardContent>
 						</Card>
 						<Card>
@@ -211,7 +227,7 @@ export default function PayrollPage() {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<p className="text-3xl font-bold">{payrollStats.pendingPayments}</p>
+								<p className="text-3xl font-bold">12</p>
 								<p className="text-sm text-muted-foreground">Due this month</p>
 							</CardContent>
 						</Card>
@@ -219,12 +235,12 @@ export default function PayrollPage() {
 							<CardHeader className="pb-3">
 								<CardTitle className="text-lg flex items-center gap-2">
 									<Globe className="w-5 h-5 text-orange-500" />
-									Yellow Network Savings
+									Supported Chains
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<p className="text-3xl font-bold">{payrollStats.yellowNetworkSavings}</p>
-								<p className="text-sm text-muted-foreground">87% cost reduction</p>
+								<p className="text-3xl font-bold">8</p>
+								<p className="text-sm text-muted-foreground">Optimal routing</p>
 							</CardContent>
 						</Card>
 					</div>
@@ -246,23 +262,9 @@ export default function PayrollPage() {
 										<Switch
 											checked={autoPayEnabled}
 											onCheckedChange={setAutoPayEnabled}
-											disabled={!isAuthenticated}
 										/>
 										<span className="text-sm">Auto-pay enabled</span>
 									</div>
-									{payrollStats.pendingPayments > 0 && (
-										<Button
-											onClick={handleProcessAll}
-											disabled={!isAuthenticated || isProcessingPayment}
-											variant="default"
-										>
-											{isProcessingPayment ? (
-												<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
-											) : (
-												<>Process All ({payrollStats.pendingPayments})</>
-											)}
-										</Button>
-									)}
 									<Button onClick={() => setShowAddEmployee(true)}>
 										<Plus className="w-4 h-4 mr-2" />
 										Add Employee
@@ -271,94 +273,48 @@ export default function PayrollPage() {
 							</div>
 
 							<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-								{employees.map((employee) => {
-									const isProcessingThisEmployee = processingEmployeeId === employee.id;
-									const isPendingPayment = new Date(employee.paymentSchedule.nextPaymentDate) <= new Date();
-
-									return (
-										<Card key={employee.id} className={isProcessingThisEmployee ? 'ring-2 ring-yellow-400' : ''}>
-											<CardHeader>
-												<div className="flex items-center justify-between">
-													<CardTitle className="text-lg">{employee.name}</CardTitle>
-													<div className="flex gap-2">
-														{employee.yellowNetworkCompatible && (
-															<Badge variant="outline" className="text-yellow-500 text-xs">
-																Yellow Network
-															</Badge>
-														)}
-														<Badge
-															variant={employee.status === 'Active' ? 'default' : 'secondary'}
-															className={employee.status === 'Active' ? 'text-green-500 border-green-500' : ''}
-														>
-															{employee.status}
-														</Badge>
-													</div>
+								{exampleEmployees.map((employee, index) => (
+									<Card key={index}>
+										<CardHeader>
+											<div className="flex items-center justify-between">
+												<CardTitle className="text-lg">{employee.name}</CardTitle>
+												<Badge variant="outline" className="text-green-500">
+													{employee.status}
+												</Badge>
+											</div>
+											<CardDescription>{employee.role} • {employee.location}</CardDescription>
+										</CardHeader>
+										<CardContent className="space-y-3">
+											<div className="grid grid-cols-2 gap-3 text-sm">
+												<div>
+													<p className="text-muted-foreground">Amount</p>
+													<p className="font-semibold">${employee.amount}</p>
 												</div>
-												<CardDescription>{employee.role} • {employee.location}</CardDescription>
-											</CardHeader>
-											<CardContent className="space-y-3">
-												<div className="grid grid-cols-2 gap-3 text-sm">
-													<div>
-														<p className="text-muted-foreground">Amount</p>
-														<p className="font-semibold">${employee.salary.amount}</p>
-													</div>
-													<div>
-														<p className="text-muted-foreground">Frequency</p>
-														<p className="font-semibold">{employee.paymentSchedule.frequency}</p>
-													</div>
-													<div>
-														<p className="text-muted-foreground">Chain</p>
-														<p className="font-semibold">{employee.salary.paymentChain}</p>
-													</div>
-													<div>
-														<p className="text-muted-foreground">Token</p>
-														<p className="font-semibold">{employee.salary.paymentToken}</p>
-													</div>
+												<div>
+													<p className="text-muted-foreground">Frequency</p>
+													<p className="font-semibold">{employee.frequency}</p>
 												</div>
-
-												{employee.lastPayment && (
-													<div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-														Last payment: ${employee.lastPayment.amount} on {new Date(employee.lastPayment.date).toLocaleDateString()}
-													</div>
-												)}
-
-												{isPendingPayment && (
-													<Badge variant="outline" className="text-orange-500 border-orange-500 w-full justify-center">
-														Payment Due
-													</Badge>
-												)}
-
-												<div className="flex gap-2">
-													<Button variant="outline" size="sm" className="flex-1">
-														<Settings className="w-4 h-4 mr-2" />
-														Edit
-													</Button>
-													<Button
-														variant={isPendingPayment ? "default" : "secondary"}
-														size="sm"
-														className="flex-1"
-														onClick={() => handlePayNow(employee.id)}
-														disabled={!isAuthenticated || isProcessingPayment || employee.status !== 'Active'}
-													>
-														{isProcessingThisEmployee ? (
-															<>
-																<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-																Processing...
-															</>
-														) : (
-															<>
-																{isPendingPayment ? (
-																	<CheckCircle className="w-4 h-4 mr-2" />
-																) : null}
-																Pay Now
-															</>
-														)}
-													</Button>
+												<div>
+													<p className="text-muted-foreground">Chain</p>
+													<p className="font-semibold">{employee.chain}</p>
 												</div>
-											</CardContent>
-										</Card>
-									);
-								})}
+												<div>
+													<p className="text-muted-foreground">Token</p>
+													<p className="font-semibold">{employee.token}</p>
+												</div>
+											</div>
+											<div className="flex gap-2">
+												<Button variant="outline" size="sm" className="flex-1">
+													<Settings className="w-4 h-4 mr-2" />
+													Edit
+												</Button>
+												<Button variant="default" size="sm" className="flex-1">
+													Pay Now
+												</Button>
+											</div>
+										</CardContent>
+									</Card>
+								))}
 							</div>
 						</div>
 					</div>
@@ -392,7 +348,7 @@ export default function PayrollPage() {
 					</div>
 				</motion.div>
 
-				{/* System Status CTA */}
+				{/* Coming Soon CTA */}
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -401,85 +357,31 @@ export default function PayrollPage() {
 				>
 					<Card className="max-w-2xl mx-auto">
 						<CardHeader>
-							<CardTitle>Yellow Network Payroll System</CardTitle>
+							<CardTitle>Revolutionize Your Global Payroll</CardTitle>
 							<CardDescription>
-								{isConnected && isAuthenticated
-									? "Your payroll system is now powered by Yellow Network state channels"
-									: "Connect to Yellow Network to enable instant, gasless payroll payments"
-								}
+								Join the waitlist for early access to cross-chain employee payroll management
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							{!isConnected || !isAuthenticated ? (
-								<div className="text-center space-y-4">
-									<Button onClick={connect} disabled={isConnecting}>
-										{isConnecting ? (
-											<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Connecting...</>
-										) : (
-											<><Wifi className="w-4 h-4 mr-2" />Connect to Yellow Network</>
-										)}
-									</Button>
-									{error && (
-										<p className="text-sm text-red-500">{error}</p>
-									)}
-								</div>
-							) : (
-								<div className="text-center space-y-4">
-									<div className="grid grid-cols-2 gap-4 text-sm">
-										<div>
-											<p className="font-medium text-green-600">Connected</p>
-											<p className="text-muted-foreground">Yellow Network</p>
-										</div>
-										<div>
-											<p className="font-medium">{payrollStats.averagePaymentTime}</p>
-											<p className="text-muted-foreground">Avg. Settlement</p>
-										</div>
-										<div>
-											<p className="font-medium">{payrollSessions.length}</p>
-											<p className="text-muted-foreground">Active Sessions</p>
-										</div>
-										<div>
-											<p className="font-medium text-green-600">{payrollStats.onTimePaymentRate}</p>
-											<p className="text-muted-foreground">On-time Rate</p>
-										</div>
-									</div>
-								</div>
-							)}
-
+							<div className="flex gap-2 max-w-md mx-auto">
+								<Input placeholder="Company email" type="email" />
+								<Button>Join Waitlist</Button>
+							</div>
+							<p className="text-xs text-muted-foreground mt-4">
+								Priority access for companies with 10+ employees
+							</p>
 							<div className="mt-6 text-sm text-muted-foreground">
-								<p className="font-medium mb-2 text-center">Powered by Yellow Network:</p>
+								<p className="font-medium mb-2">Coming Soon:</p>
 								<div className="flex gap-4 justify-center">
-									<Badge variant="secondary">State Channels</Badge>
-									<Badge variant="secondary">Gasless Transactions</Badge>
-									<Badge variant="secondary">Instant Settlement</Badge>
+									<Badge variant="secondary">Vendor Payments</Badge>
+									<Badge variant="secondary">SaaS Subscriptions</Badge>
+									<Badge variant="secondary">Expense Management</Badge>
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 				</motion.div>
 			</div>
-
-			{/* Employee Management Modal */}
-			<EmployeeManagement
-				isOpen={showAddEmployee}
-				onClose={() => setShowAddEmployee(false)}
-				onSubmit={handleAddEmployee}
-			/>
-
-			{/* Payment Status Modal */}
-			<PaymentStatusModal
-				isOpen={showPaymentStatus}
-				onClose={() => {
-					setShowPaymentStatus(false);
-					setCurrentPaymentSession(null);
-				}}
-				session={currentPaymentSession}
-				employeeName={
-					currentPaymentSession && processingEmployeeId
-						? employees.find(emp => emp.id === processingEmployeeId)?.name
-						: undefined
-				}
-			/>
 		</div>
 	);
 }

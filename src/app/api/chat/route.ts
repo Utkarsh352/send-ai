@@ -8,6 +8,9 @@ import { getYellowBalance } from "./tools/getYellowBalance";
 import { findCrossChainRoute } from "./tools/findCrossChainRoute";
 import { getMultiChainBalance } from "./tools/getMultiChainBalance";
 import { exploreDeFiProtocols } from "./tools/exploreDeFiProtocols";
+import { addEmployee } from "./tools/addEmployee";
+import { processPayroll } from "./tools/processPayroll";
+import { getPayrollStatus } from "./tools/getPayrollStatus";
 
 export const maxDuration = 30;
 
@@ -52,6 +55,9 @@ const systemPrompt = {
 	• Balance Check: Check token balances on specific chains user chooses
 	• Cross-Chain Routes: Find optimal paths for cross-chain transfers
 	• Multi-Chain Portfolio: Comprehensive portfolio view across multiple blockchains
+	• Payroll Management: Add employees, process payroll payments, and manage global workforce
+	• Employee Onboarding: Set up cross-chain payment preferences for new employees
+	• Payroll Status: Get payroll overview, payment status, and employee information
 
 	SUPPORTED CHAINS: Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BSC, Fantom, and many more
 	SUPPORTED TOKENS: ETH, USDC, USDT, BTC, MATIC, AVAX, BNB, and thousands of others
@@ -83,6 +89,9 @@ export async function POST(req: Request) {
 			send,
 			convert,
 			swap,
+			addEmployee,
+			processPayroll,
+			getPayrollStatus,
 		};
 
 		let model;
