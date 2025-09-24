@@ -17,10 +17,10 @@ interface DashboardLayoutProps {
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home, badge: null },
-  { name: "Send Crypto", href: "/dashboard/send", icon: Send, badge: null },
-  { name: "Recipients", href: "/dashboard/recipients", icon: Users, badge: null },
-  { name: "Transaction History", href: "/dashboard/history", icon: History, badge: null },
-  { name: "Wallets", href: "/dashboard/wallets", icon: Wallet, badge: null },
+  { name: "Employees", href: "/dashboard/employees", icon: Users, badge: null },
+  { name: "Payroll Runs", href: "/dashboard/payroll-runs", icon: Send, badge: null },
+  { name: "Payment History", href: "/dashboard/history", icon: History, badge: null },
+  { name: "Yellow Network", href: "/dashboard/yellow-network", icon: Activity, badge: null },
   { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp, badge: null },
   { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
 ];
@@ -39,7 +39,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
           <div>
             <h1 className="font-bold text-lg bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Send-ai</h1>
-            <p className="text-xs text-muted-foreground">Crypto Payment Platform</p>
+            <p className="text-xs text-muted-foreground">Web3 Payroll Platform</p>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">John Doe</p>
-            <p className="text-xs text-muted-foreground truncate">Crypto Manager</p>
+            <p className="text-xs text-muted-foreground truncate">Payroll Manager</p>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="relative w-96 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search recipients, transactions..."
+                placeholder="Search employees, payrolls..."
                 className="pl-10"
               />
             </div>
@@ -148,16 +148,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 <div className="p-2">
                   <div className="p-3 rounded-lg bg-muted/50 mb-2">
-                    <p className="text-sm font-medium">Crypto Batch Ready</p>
-                    <p className="text-xs text-muted-foreground">Monthly crypto batch for Engineering team is ready to send</p>
+                    <p className="text-sm font-medium">Payroll Ready</p>
+                    <p className="text-xs text-muted-foreground">Weekly payroll for 15 employees ready for processing</p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50 mb-2">
-                    <p className="text-sm font-medium">High Network Fees</p>
-                    <p className="text-xs text-muted-foreground">Bitcoin network fees are currently elevated</p>
+                    <p className="text-sm font-medium">Yellow Network Status</p>
+                    <p className="text-xs text-muted-foreground">Connected to Yellow Network with optimal routing</p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50">
-                    <p className="text-sm font-medium">New Recipient</p>
-                    <p className="text-xs text-muted-foreground">Alice Johnson has been added as a recipient</p>
+                    <p className="text-sm font-medium">New Employee</p>
+                    <p className="text-xs text-muted-foreground">Alice Johnson added with $75/hour rate</p>
                   </div>
                 </div>
               </DropdownMenuContent>
@@ -173,7 +173,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </Avatar>
                   <div className="hidden sm:block text-left">
                     <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">Crypto Manager</p>
+                    <p className="text-xs text-muted-foreground">Payroll Manager</p>
                   </div>
                   <ChevronDown className="w-4 h-4" />
                 </Button>

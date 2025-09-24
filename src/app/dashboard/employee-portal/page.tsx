@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, FileText, Download, Upload, Calendar, DollarSign, Clock, CreditCard, Settings, Bell, RefreshCw, Plus } from "lucide-react";
+import { User, FileText, Download, Upload, Calendar, DollarSign, Clock, CreditCard, Settings, Bell, RefreshCw, Plus, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,16 @@ interface ReimbursementClaim {
   status: "Approved" | "Pending" | "Rejected";
   submittedDate: string;
   receipts: string[];
+}
+
+interface Transaction {
+  id: string;
+  type: "credit" | "debit";
+  amount: number;
+  description: string;
+  date: string;
+  status: "Completed" | "Pending" | "Failed";
+  reference: string;
 }
 
 export default function EmployeePortalPage() {
@@ -155,15 +165,65 @@ export default function EmployeePortalPage() {
     }
   ];
 
+  const transactions: Transaction[] = [
+    {
+      id: "TXN001",
+      type: "credit",
+      amount: 125.50,
+      description: "Hourly earnings claim",
+      date: "2024-12-23",
+      status: "Completed",
+      reference: "PAY-2024-001"
+    },
+    {
+      id: "TXN002",
+      type: "credit",
+      amount: 300.00,
+      description: "Hourly earnings claim",
+      date: "2024-12-20",
+      status: "Completed",
+      reference: "PAY-2024-002"
+    },
+    {
+      id: "TXN003",
+      type: "credit",
+      amount: 87.25,
+      description: "Overtime earnings",
+      date: "2024-12-18",
+      status: "Completed",
+      reference: "OT-2024-001"
+    },
+    {
+      id: "TXN004",
+      type: "credit",
+      amount: 425.00,
+      description: "Weekly salary payment",
+      date: "2024-12-15",
+      status: "Completed",
+      reference: "SAL-2024-50"
+    },
+    {
+      id: "TXN005",
+      type: "credit",
+      amount: 95.50,
+      description: "Hourly earnings claim",
+      date: "2024-12-13",
+      status: "Pending",
+      reference: "PAY-2024-003"
+    }
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Paid":
       case "Approved":
+      case "Completed":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       case "Pending":
       case "Processing":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
       case "Rejected":
+      case "Failed":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
@@ -215,7 +275,7 @@ export default function EmployeePortalPage() {
         </Card>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">This Month</CardTitle>
@@ -224,6 +284,16 @@ export default function EmployeePortalPage() {
             <CardContent>
               <div className="text-2xl font-bold">${payslips[0]?.netPay.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">Net Pay</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Claimable Amount</CardTitle>
+              <Wallet className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">$425.50</div>
+              <p className="text-xs text-muted-foreground">Ready to claim</p>
             </CardContent>
           </Card>
           <Card>
@@ -258,9 +328,40 @@ export default function EmployeePortalPage() {
           </Card>
         </div>
 
+        {/* Claim Available Earnings */}
+        <Card className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-green-800 dark:text-green-200">Available to Claim</CardTitle>
+                <CardDescription className="text-green-700 dark:text-green-300">
+                  Your hourly earnings are ready for instant withdrawal
+                </CardDescription>
+              </div>
+              <div className="text-3xl font-bold text-green-600">$425.50</div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-green-700 dark:text-green-300">
+                <p>Based on 17.02 hours worked this week</p>
+                <p>Last updated: 2 minutes ago</p>
+              </div>
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+              >
+                <DollarSign className="w-5 h-5 mr-2" />
+                Claim Now
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Main Content Tabs */}
-        <Tabs defaultValue="payslips" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="transactions" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="transactions">Transaction History</TabsTrigger>
             <TabsTrigger value="payslips">My Payslips</TabsTrigger>
             <TabsTrigger value="tax">Tax Declarations</TabsTrigger>
             <TabsTrigger value="reimbursements">Reimbursements</TabsTrigger>
@@ -268,11 +369,65 @@ export default function EmployeePortalPage() {
             <TabsTrigger value="leaves">Attendance & Leaves</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="transactions">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="w-5 h-5" />
+                  Transaction History
+                </CardTitle>
+                <CardDescription>
+                  Your complete payment and earnings history
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Reference</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((transaction) => (
+                        <TableRow key={transaction.id}>
+                          <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {transaction.type === "credit" ? (
+                                <ArrowDownRight className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <ArrowUpRight className="w-4 h-4 text-red-500" />
+                              )}
+                              <span className="capitalize">{transaction.type}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{transaction.description}</TableCell>
+                          <TableCell className={transaction.type === "credit" ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                            {transaction.type === "credit" ? "+" : "-"}${transaction.amount.toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusColor(transaction.status)}>
+                              {transaction.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">{transaction.reference}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="payslips">
-            <div
-              }
-              }
-            >
+            <div>
               <Card>
                 <CardHeader>
                   <CardTitle>My Payslips</CardTitle>

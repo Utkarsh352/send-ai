@@ -45,7 +45,7 @@ export default function LandingPage() {
 			<LampContainer className="px-6 pt-24 pb-16">
 				<motion.h1
 					initial={{ opacity: 0, y: 50 }}
-					animate={hasLoaded ? { opacity: 1, y: 0 } : {}}
+					animate={hasLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
 					transition={{
 						delay: 0.3,
 						duration: 0.8,
@@ -61,9 +61,7 @@ export default function LandingPage() {
 				</p>
 
 				{/* Action Buttons */}
-
-				{/* Action Buttons */}
-				<div className="mt-8 flex justify-center items-center">
+				<div className="mt-8 flex justify-center items-center gap-4">
 					<Button
 						onClick={() => {
 							setIsLoading(true);
@@ -75,6 +73,16 @@ export default function LandingPage() {
 					>
 						Get Started
 						{isLoading && <Loader2 className="animate-spin ml-2 w-4 h-4"/>}
+					</Button>
+					<Button
+						onClick={() => {
+							router.push("/dashboard/employee-portal");
+						}}
+						size="lg"
+						variant="outline"
+						className="rounded-full border-2 border-yellow-500 hover:bg-yellow-500/10 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+					>
+						Employee Portal
 					</Button>
 				</div>
 
