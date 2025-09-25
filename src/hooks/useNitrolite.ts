@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { type Address, type WalletClient } from 'viem';
+import { ethers } from 'ethers';
 import {
     createAuthRequestMessage,
     createAuthVerifyMessage,
@@ -16,6 +17,7 @@ import {
     type GetLedgerBalancesResponse,
     type BalanceUpdateResponse,
     type TransferResponse,
+    type MessageSigner,
 } from '@erc7824/nitrolite';
 import { webSocketService, type WsStatus } from '@/lib/websocket';
 import {
@@ -81,6 +83,8 @@ export function useNitrolite(): NitroliteState & NitroliteActions {
     const [lastTransferError, setLastTransferError] = useState<string | null>(null);
     const [sessionExpireTimestamp, setSessionExpireTimestamp] = useState<string>('');
     const [authAttemptCount, setAuthAttemptCount] = useState(0);
+    const [currentWallet, setCurrentWallet] = useState<ethers.Wallet | null>(null);
+    const [messageSigner, setMessageSigner] = useState<MessageSigner | null>(null);
 
     // Initialize session key on mount
     useEffect(() => {
@@ -107,7 +111,7 @@ export function useNitrolite(): NitroliteState & NitroliteActions {
         setIsAuthenticating(false);
     }, []);
 
-    // Simplified authentication using private key (like Cerebro)
+    // Proper Nitrolite authentication using the protocol
     const authenticate = useCallback(async (privateKey: string, signerName: string = 'utk_signer') => {
         if (wsStatus !== 'Connected') {
             console.log('Cannot authenticate: not connected to WebSocket');
@@ -124,48 +128,72 @@ export function useNitrolite(): NitroliteState & NitroliteActions {
             setIsAuthenticating(true);
             setLastTransferError(null);
 
-            // Format user without 0x prefix, exactly like Cerebro expects
-            const user = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
+            // Create wallet from private key
+            const wallet = new ethers.Wallet(privateKey);
+            setCurrentWallet(wallet);
 
-            // Simple authentication message like Cerebro - send as string
-            const authCommand = `authenticate ${user} ${signerName}`;
-            console.log('Sending auth command:', authCommand);
+            // Create message signer
+            const signer: MessageSigner = async (payload) => {
+                try {
+                    const message = JSON.stringify(payload);
+                    const digestHex = ethers.utils.id(message);
+                    const messageBytes = ethers.utils.arrayify(digestHex);
+                    const signature = wallet._signingKey().signDigest(messageBytes);
+                    return ethers.utils.joinSignature(signature) as `0x${string}`;
+                } catch (error) {
+                    console.error('Error signing message:', error);
+                    throw error;
+                }
+            };
+            setMessageSigner(signer);
 
-            webSocketService.send(authCommand);
+            // Create proper Nitrolite auth request message
+            const authRequest = await createAuthRequestMessage({
+                wallet: wallet.address,
+                participant: wallet.address,
+                app_name: APP_NAME,
+                expire: (Math.floor(Date.now() / 1000) + SESSION_DURATION).toString(),
+                scope: AUTH_SCOPE,
+                application: '0x0000000000000000000000000000000000000000',
+                allowances: [],
+            });
+
+            console.log('Sending Nitrolite auth request');
+            webSocketService.send(authRequest);
         } catch (error) {
             console.error('Authentication failed:', error);
             setIsAuthenticating(false);
         }
     }, [wsStatus, isAuthenticating]);
 
-    // Balance fetching - Simple like Cerebro "list channels" command
+    // Balance fetching using Nitrolite protocol
     const fetchBalances = useCallback(async (account: Address) => {
-        if (!isAuthenticated) {
-            console.log('Cannot fetch balances: not authenticated');
+        if (!isAuthenticated || !messageSigner) {
+            console.log('Cannot fetch balances: not authenticated or no signer');
             return;
         }
 
         try {
             setIsLoadingBalances(true);
 
-            // Simple balance request like Cerebro - send as string command
-            const balanceCommand = 'list channels';
-            console.log('Sending balance command:', balanceCommand);
+            // Create proper Nitrolite get ledger balances message
+            const balanceMessage = await createGetLedgerBalancesMessage(messageSigner, account);
+            console.log('Sending Nitrolite balance request');
 
-            webSocketService.send(balanceCommand);
+            webSocketService.send(balanceMessage);
         } catch (error) {
             console.error('Failed to fetch balances:', error);
             setIsLoadingBalances(false);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, messageSigner]);
 
-    // Transfer - Simple Yellow Network transfer like Cerebro
+    // Transfer using Nitrolite protocol
     const transfer = useCallback(async (
         recipient: Address,
         amount: string,
-        asset: string = 'ytest.usd'
+        asset: string = 'usdc'
     ): Promise<{ success: boolean; error?: string }> => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated || !messageSigner) {
             return { success: false, error: 'Please authenticate first' };
         }
 
@@ -173,11 +201,19 @@ export function useNitrolite(): NitroliteState & NitroliteActions {
             setIsTransferring(true);
             setLastTransferError(null);
 
-            // Simple transfer command like Cerebro "transfer <to> <amount> <asset>"
-            const transferCommand = `transfer ${recipient} ${amount} ${asset}`;
-            console.log('Sending transfer command:', transferCommand);
+            // Create proper Nitrolite transfer message
+            const transferMessage = await createTransferMessage(messageSigner, {
+                destination: recipient,
+                allocations: [
+                    {
+                        asset: asset.toLowerCase(),
+                        amount: amount,
+                    }
+                ],
+            });
 
-            webSocketService.send(transferCommand);
+            console.log('Sending Nitrolite transfer request');
+            webSocketService.send(transferMessage);
 
             return { success: true };
         } catch (error) {
@@ -187,96 +223,112 @@ export function useNitrolite(): NitroliteState & NitroliteActions {
             setIsTransferring(false);
             return { success: false, error: errorMsg };
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, messageSigner]);
 
-    // Message handling for Cerebro-style responses
+    // Message handling for Nitrolite protocol
     useEffect(() => {
         const handleMessage = async (data: any) => {
             console.log('Nitrolite message:', data);
 
-            // Handle string responses from Cerebro
-            if (typeof data === 'string') {
-                const message = data.toLowerCase();
+            try {
+                // Parse the Nitrolite RPC response
+                const message = parseAnyRPCResponse(data);
+                console.log('Parsed message:', message);
 
-                // Handle authentication success
-                if (message.includes('authentication successful') || message.includes('welcome')) {
-                    setIsAuthenticated(true);
-                    setIsAuthenticating(false);
-                    setAuthAttemptCount(0);
-                    console.log('Authentication successful!');
-                    return;
-                }
-
-                // Handle authentication failure
-                if (message.includes('authentication failed') || message.includes('invalid')) {
-                    setIsAuthenticating(false);
-                    setLastTransferError('Authentication failed');
-                    return;
-                }
-
-                // Handle transfer success
-                if (message.includes('transfer successful') || message.includes('sent')) {
-                    console.log('Transfer completed:', data);
-                    setIsTransferring(false);
-                    return;
-                }
-
-                // Handle transfer failure
-                if (message.includes('transfer failed') || message.includes('insufficient')) {
-                    console.log('Transfer failed:', data);
-                    setIsTransferring(false);
-                    setLastTransferError(data);
-                    return;
-                }
-
-                return;
-            }
-
-            // Handle object responses (channels list, etc.)
-            if (typeof data === 'object') {
-                // Handle channels response (for balance info)
-                if (data.channels && Array.isArray(data.channels)) {
-                    const channels = data.channels;
-                    const balancesMap: Record<string, string> = {};
-
-                    channels.forEach((channel: any) => {
-                        if (channel.asset && channel.balance !== undefined) {
-                            balancesMap[channel.asset] = channel.balance.toString();
+                switch (message.method) {
+                    case RPCMethod.AuthChallenge:
+                        console.log('Received auth challenge, verifying...');
+                        if (messageSigner) {
+                            try {
+                                const authVerify = await createAuthVerifyMessage(messageSigner, message);
+                                webSocketService.send(authVerify);
+                            } catch (error) {
+                                console.error('Auth verify failed:', error);
+                                setIsAuthenticating(false);
+                                setLastTransferError('Authentication verification failed');
+                            }
                         }
-                    });
+                        break;
 
-                    setBalances(balancesMap);
-                    setIsLoadingBalances(false);
-                    return;
+                    case RPCMethod.AuthVerify:
+                        console.log('Received auth verify response:', message.params);
+                        if (message.params?.success) {
+                            setIsAuthenticated(true);
+                            setIsAuthenticating(false);
+                            setAuthAttemptCount(0);
+                            console.log('Authentication successful!');
+
+                            if (message.params.jwtToken) {
+                                storeJWT(message.params.jwtToken);
+                            }
+                        } else {
+                            setIsAuthenticating(false);
+                            setLastTransferError('Authentication failed');
+                        }
+                        break;
+
+                    case RPCMethod.GetLedgerBalances:
+                        if (message.params && Array.isArray(message.params)) {
+                            const balancesMap: Record<string, string> = {};
+                            message.params.forEach((balance: any) => {
+                                if (balance.asset && balance.amount !== undefined) {
+                                    balancesMap[balance.asset] = balance.amount.toString();
+                                }
+                            });
+                            setBalances(balancesMap);
+                            setIsLoadingBalances(false);
+                        }
+                        break;
+
+                    case RPCMethod.Transfer:
+                        if (message.params?.success) {
+                            console.log('Transfer completed successfully');
+                            setIsTransferring(false);
+                        } else {
+                            console.log('Transfer failed:', message.params);
+                            setIsTransferring(false);
+                            setLastTransferError(message.params?.error || 'Transfer failed');
+                        }
+                        break;
+
+                    default:
+                        console.log('Unhandled message method:', message.method);
+
+                        // Handle error responses
+                        if (data.error || (Array.isArray(data) && data[1] === 'error')) {
+                            const error = data.error || (Array.isArray(data) ? data[2]?.error : 'Unknown error');
+                            console.error('Error from server:', error);
+                            if (isAuthenticating) {
+                                setIsAuthenticating(false);
+                                setLastTransferError('Authentication failed: ' + error);
+                            } else if (isTransferring) {
+                                setIsTransferring(false);
+                                setLastTransferError('Transfer failed: ' + error);
+                            }
+                        }
+                        break;
                 }
+            } catch (error) {
+                console.error('Error parsing message:', error, 'Raw data:', data);
 
-                // Handle welcome message with authentication
-                if (data.message && data.message.includes('Authentication successful')) {
-                    setIsAuthenticated(true);
-                    setIsAuthenticating(false);
-                    setAuthAttemptCount(0);
-                    console.log('Authentication successful!');
-                    return;
-                }
-
-                // Handle error messages
-                if (data.error) {
-                    console.error('Error from server:', data.error);
+                // Handle raw error responses that can't be parsed
+                if (data.error || (Array.isArray(data) && data[1] === 'error')) {
+                    const errorMsg = data.error || (Array.isArray(data) ? data[2]?.error : 'Unknown error');
+                    console.error('Raw error from server:', errorMsg);
                     if (isAuthenticating) {
                         setIsAuthenticating(false);
-                        setLastTransferError('Authentication failed: ' + data.error);
+                        setLastTransferError('Authentication failed: ' + errorMsg);
                     } else if (isTransferring) {
                         setIsTransferring(false);
-                        setLastTransferError('Transfer failed: ' + data.error);
+                        setLastTransferError('Transfer failed: ' + errorMsg);
                     }
-                    return;
                 }
             }
         };
 
         webSocketService.addMessageListener(handleMessage);
         return () => webSocketService.removeMessageListener(handleMessage);
-    }, [sessionExpireTimestamp, isTransferring, isAuthenticating]);
+    }, [messageSigner, isTransferring, isAuthenticating]);
 
     return {
         // State

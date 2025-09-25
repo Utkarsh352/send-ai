@@ -93,7 +93,7 @@ We built the first **crypto-powered real-time payroll system**:
 ## 🚀 Quick Start 💡
 
 **For Employers:**
-1. Clone: `git clone https://github.com/Utkarsh352/send-ai.git`
+1. Clone: `git clone https://github.com/Send-ai/send-ai.git`
 2. Install: `npm install`
 3. Start: `npm run dev`
 4. Navigate to `/dashboard` and connect with your private key
@@ -176,7 +176,7 @@ This project is licensed under the [MIT License](LICENSE).  Thanks to [list cont
 ## 📞 Support and Contact 📧
 
 [![Twitter](https://img.shields.io/twitter/follow/therapyorme?style=social)](https://twitter.com/therapyorme)
-[![Email](https://img.shields.io/badge/Email-utu3528@gmail.com-blue)](mailto:utu3528@gmail.com)
+[![Email](https://img.shields.io/badge/Email-Send-ai@gmail.com-blue)](mailto:Send-ai@gmail.com)
 
 
 ---
