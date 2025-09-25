@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { User, FileText, Download, Upload, Calendar, DollarSign, Clock, CreditCard, Settings, Bell, RefreshCw, Plus, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useNitroliteContext } from "@/providers/NitroliteProvider";
+import { useClaimEarnings } from "@/hooks/useClaimEarnings";
 
 
 interface Payslip {
@@ -57,37 +58,51 @@ export default function EmployeePortalPage() {
   // Connect to Nitrolite for balance and claiming functionality
   const nitrolite = useNitroliteContext();
 
-  // Calculate claimable amount from balance
-  const claimableAmount = nitrolite.balances?.['usdc'] || nitrolite.balances?.['USDC'] || '0';
+  // Hook for claiming earnings
+  const claimHook = useClaimEarnings();
+
+  // Employee wallet address (in real app this would come from authentication)
+  const employeeWalletAddress = '0x1234567890123456789012345678901234567890'; // Mock address
+
+  // Calculate claimable amount from balance or earnings
+  const claimableAmount = claimHook.earnings?.availableAmount ||
+                          nitrolite.balances?.['ytest.usd'] ||
+                          nitrolite.balances?.['usdc'] ||
+                          '0';
   const claimableFloat = parseFloat(claimableAmount);
 
+  // Fetch earnings on mount and when authenticated
+  React.useEffect(() => {
+    if (nitrolite.isAuthenticated && employeeWalletAddress) {
+      claimHook.fetchEarnings(employeeWalletAddress as `0x${string}`);
+    }
+  }, [nitrolite.isAuthenticated, employeeWalletAddress]);
+
   const handleClaim = async () => {
-    if (!nitrolite.account || !nitrolite.isAuthenticated) {
-      alert('Please connect your wallet and authenticate first');
+    if (!nitrolite.isAuthenticated) {
+      alert('Please authenticate first');
       return;
     }
 
     if (claimableFloat <= 0) {
-      alert('No funds available to claim');
+      alert('No earnings available to claim');
       return;
     }
 
     try {
       setIsClaiming(true);
-      // In a real implementation, this would transfer from employer to employee
-      // For demo purposes, we'll show a success message
 
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate transaction time
+      const result = await claimHook.claimAllEarnings(employeeWalletAddress as `0x${string}`);
 
-      alert(`Successfully claimed $${claimableFloat.toFixed(2)} USDC!`);
-
-      // Refresh balances
-      if (nitrolite.account) {
-        nitrolite.fetchBalances(nitrolite.account);
+      if (result.success) {
+        alert(`Successfully claimed ${result.amount} ${claimHook.earnings?.asset || 'tokens'}!`);
+      } else {
+        throw new Error(result.error || 'Claim failed');
       }
+
     } catch (error) {
       console.error('Claim failed:', error);
-      alert('Failed to claim funds. Please try again.');
+      alert('Failed to claim earnings. Please try again.');
     } finally {
       setIsClaiming(false);
     }
@@ -303,10 +318,10 @@ export default function EmployeePortalPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {nitrolite.isLoadingBalances ? 'Loading...' : `$${claimableFloat.toFixed(2)}`}
+                {claimHook.isLoadingEarnings || nitrolite.isLoadingBalances ? 'Loading...' : `${claimableFloat.toFixed(2)}`}
               </div>
               <p className="text-xs text-muted-foreground">
-                {nitrolite.isAuthenticated ? 'Ready to claim' : 'Connect wallet to view'}
+                {nitrolite.isAuthenticated ? `${claimHook.earnings?.asset || 'tokens'} ready to claim` : 'Authenticate to view'}
               </p>
             </CardContent>
           </Card>
@@ -356,9 +371,9 @@ export default function EmployeePortalPage() {
                 </CardDescription>
               </div>
               <div className="text-3xl font-bold text-green-600">
-                {nitrolite.isLoadingBalances ? 'Loading...' :
-                 nitrolite.isAuthenticated ? `$${claimableFloat.toFixed(2)}` :
-                 '$0.00'}
+                {claimHook.isLoadingEarnings || nitrolite.isLoadingBalances ? 'Loading...' :
+                 nitrolite.isAuthenticated ? `${claimableFloat.toFixed(2)}` :
+                 '0.00'}
               </div>
             </div>
           </CardHeader>
@@ -367,13 +382,16 @@ export default function EmployeePortalPage() {
               <div className="text-sm text-green-700 dark:text-green-300">
                 {nitrolite.isAuthenticated ? (
                   <>
-                    <p>Available balance from your Nitrolite account</p>
-                    <p>Last updated: {nitrolite.balances ? 'Just now' : 'Never'}</p>
+                    <p>Available earnings from hourly work</p>
+                    <p>Last updated: {claimHook.earnings?.lastUpdated ? claimHook.earnings.lastUpdated.toLocaleTimeString() : 'Fetching...'}</p>
+                    {claimHook.earnings && (
+                      <p className="mt-1">Total earned: {claimHook.earnings.totalEarned} {claimHook.earnings.asset}</p>
+                    )}
                   </>
                 ) : (
                   <>
-                    <p>Connect wallet to view earnings</p>
-                    <p>Payments processed via Yellow Network</p>
+                    <p>Authenticate to view your earnings</p>
+                    <p>Powered by Yellow Network</p>
                   </>
                 )}
               </div>
@@ -381,9 +399,9 @@ export default function EmployeePortalPage() {
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 disabled:opacity-50"
                 onClick={handleClaim}
-                disabled={!nitrolite.isAuthenticated || claimableFloat <= 0 || isClaiming || nitrolite.isLoadingBalances}
+                disabled={!nitrolite.isAuthenticated || claimableFloat <= 0 || isClaiming || claimHook.isClaiming || claimHook.isLoadingEarnings}
               >
-                {isClaiming ? (
+                {isClaiming || claimHook.isClaiming ? (
                   <>
                     <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
                     Claiming...
@@ -391,17 +409,17 @@ export default function EmployeePortalPage() {
                 ) : !nitrolite.isAuthenticated ? (
                   <>
                     <Wallet className="w-5 h-5 mr-2" />
-                    Connect Wallet
+                    Authenticate
                   </>
                 ) : claimableFloat <= 0 ? (
                   <>
                     <DollarSign className="w-5 h-5 mr-2" />
-                    No Funds
+                    No Earnings
                   </>
                 ) : (
                   <>
                     <DollarSign className="w-5 h-5 mr-2" />
-                    Claim Now
+                    Claim {claimableFloat.toFixed(2)} {claimHook.earnings?.asset || 'tokens'}
                   </>
                 )}
               </Button>

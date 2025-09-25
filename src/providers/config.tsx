@@ -1,4 +1,4 @@
-import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { http, createConfig } from 'wagmi';
 import { mainnet } from "wagmi/chains";
 import { defineChain } from "viem";
 
@@ -52,9 +52,11 @@ export const yellowMainnet = defineChain({
   },
 });
 
-export const config = getDefaultConfig({
-  appName: "Send-AI",
-  projectId: "7a8f913d026858bae28fb603bc9b42ca",
+export const config = createConfig({
   chains: [yellowTestnet, yellowMainnet, mainnet],
-  ssr: false,
+  transports: {
+    [yellowTestnet.id]: http(),
+    [yellowMainnet.id]: http(),
+    [mainnet.id]: http(),
+  },
 });

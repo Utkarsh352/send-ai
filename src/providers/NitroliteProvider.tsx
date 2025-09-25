@@ -25,23 +25,20 @@ export function NitroliteProvider({ children }: NitroliteProviderProps) {
     // Auto-authenticate when WebSocket connects and private key is available
     useEffect(() => {
         if (nitrolite.wsStatus === 'Connected' && privateKey && !nitrolite.isAuthenticated && !nitrolite.isAuthenticating) {
-            // Add a small delay to prevent rapid successive calls
-            const authTimer = setTimeout(() => {
-                nitrolite.authenticate(privateKey, 'utk_signer');
-            }, 500);
-
-            return () => clearTimeout(authTimer);
+            console.log('Auto-authenticating with private key');
+            nitrolite.authenticate(privateKey, 'utk_signer');
         }
-    }, [nitrolite.wsStatus, privateKey, nitrolite.isAuthenticated, nitrolite.isAuthenticating]);
+    }, [nitrolite.wsStatus, privateKey]);
 
-    // Auto-fetch balances when authenticated (using a dummy address since we don't need wallet for balance)
+    // Auto-fetch balances when authenticated
     useEffect(() => {
-        if (nitrolite.isAuthenticated && privateKey && !nitrolite.balances) {
-            // Use the private key as a dummy address for balance fetching
-            const address = `0x${privateKey.replace('0x', '').slice(0, 40)}` as Address;
-            nitrolite.fetchBalances(address);
+        if (nitrolite.isAuthenticated && !nitrolite.isLoadingBalances && !nitrolite.balances) {
+            console.log('Auto-fetching balances');
+            // Use a dummy address since Cerebro doesn't need it for list channels
+            const dummyAddress = '0x0000000000000000000000000000000000000000' as Address;
+            nitrolite.fetchBalances(dummyAddress);
         }
-    }, [nitrolite.isAuthenticated, privateKey, nitrolite.balances]);
+    }, [nitrolite.isAuthenticated]);
 
     // Initialize connection on mount
     useEffect(() => {

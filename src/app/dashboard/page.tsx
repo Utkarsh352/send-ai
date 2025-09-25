@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { HourlyPaymentManager } from "@/components/payroll/HourlyPaymentManager";
 import { useNitroliteContext } from "@/providers/NitroliteProvider";
 
 interface Employee {
@@ -93,11 +94,18 @@ export default function DashboardPage() {
     try {
       setIsSending(true);
 
-      // In a real implementation, this would call your Nitrolite transfer function
-      // For now, we'll simulate the transaction
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Use real Nitrolite transfer through Yellow Network
+      const transferResult = await nitrolite.transfer(
+        employee.walletAddress as any,
+        amount.toString(),
+        sendCurrency.toLowerCase()
+      );
 
-      alert(`Successfully sent $${amount} ${sendCurrency} to ${employee.name}!`);
+      if (transferResult.success) {
+        alert(`Successfully sent $${amount} ${sendCurrency} to ${employee.name}!`);
+      } else {
+        throw new Error(transferResult.error || 'Transfer failed');
+      }
 
       // Reset form
       setSelectedEmployee("");
@@ -217,7 +225,7 @@ export default function DashboardPage() {
                   Crypto Dashboard
                 </h1>
                 <p className="text-muted-foreground">
-                  Welcome back! Here's your crypto transaction overview for {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}.
+                  Welcome back! Here&apos;s your crypto transaction overview for {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}.
                 </p>
               </div>
             </div>
@@ -584,6 +592,11 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Hourly Payment System */}
+        <div className="mt-12">
+          <HourlyPaymentManager />
         </div>
       </div>
     </DashboardLayout>

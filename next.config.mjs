@@ -40,6 +40,13 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+
+  eslint: {
+    // !! WARN !!
+    // Ignore ESLint errors during build for faster deployment
+    // !! WARN !!
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

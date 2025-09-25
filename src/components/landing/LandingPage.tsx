@@ -1,9 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useEffect, useState } from "react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
-import { yellowTestnet } from "@/providers/config";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -23,9 +20,6 @@ import { PayrollDashboardPreview } from "./PayrollDashboardPreview";
 import UsageApplicationCards from "./UsageApplicationCards";
 
 export default function LandingPage() {
-	const chainId = useChainId();
-	const { switchChain } = useSwitchChain();
-	const { address, isConnected } = useAccount();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [hasLoaded, setHasLoaded] = useState(false);
@@ -34,11 +28,6 @@ export default function LandingPage() {
 		setHasLoaded(true);
 	}, []);
 
-	useEffect(() => {
-		if (isConnected && chainId !== yellowTestnet.id) {
-			switchChain?.({ chainId: yellowTestnet.id });
-		}
-	}, [chainId, isConnected, switchChain]);
 
 	return (
 		<div className="w-full min-h-screen text-foreground">
